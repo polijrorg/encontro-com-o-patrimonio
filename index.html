@@ -138,7 +138,7 @@ body.mode-map #page{display:none}
 .legenda .tot{font-size:1.5rem;font-weight:700;color:var(--red-t);line-height:1}
 .legenda ul{list-style:none;margin:.5rem 0;padding:0;display:flex;flex-direction:column;gap:.2rem}
 .legenda li{display:flex;justify-content:space-between;gap:1rem}
-.legenda .foot{display:flex;justify-content:space-between;align-items:flex-end;gap:.5rem;margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem}
+.legenda .foot{display:flex;flex-direction:column;align-items:flex-start;gap:.5rem;margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem}
 .amostra{position:absolute;right:.75rem;bottom:1.75rem;z-index:5;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:6px;padding:.25rem .5rem;font-size:.75rem;color:var(--mut);max-width:15rem}
 .side{position:absolute;z-index:8;top:.75rem;right:.75rem;bottom:.75rem;width:25rem;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 36px rgba(43,37,35,.22);display:flex;flex-direction:column;overflow:hidden}
 .side .grab{display:none}
@@ -192,7 +192,7 @@ figcaption.cr{font-size:.8125rem;color:var(--mut);margin-top:.4rem}
 .tl li.tb::before{background:var(--red-t)}
 .tl b{display:block;font-size:1.25rem;color:var(--red-t)}
 .tl span{font-size:.9rem}
-.ft{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 2rem;margin:0;max-width:56rem}
+.ft{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 2rem;margin:0;max-width:68rem}
 .ft div{display:grid;grid-template-columns:11rem minmax(0,1fr);gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--line)}
 .ft dt{color:var(--mut);font-size:.875rem}
 .ft dd{margin:0;font-weight:500}
@@ -228,7 +228,7 @@ figcaption.cr{font-size:.8125rem;color:var(--mut);margin-top:.4rem}
 .bars .b i{display:block;height:100%}
 .bars .v{text-align:right;font-weight:600}
 .lista{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
-.lista li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:1rem;align-items:center;padding:.8rem 0;border-bottom:1px solid var(--line)}
+.lista li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,15rem) minmax(0,8rem);gap:1rem;align-items:center;padding:.8rem 0;border-bottom:1px solid var(--line)}
 .lista a.n{font-weight:600;text-decoration:none;color:var(--ink)} .lista a.n:hover{color:var(--red-t);text-decoration:underline}
 .ltools{display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap;margin:1rem 0 .5rem}
 .ltools select{border:1px solid var(--line2);border-radius:6px;padding:.4rem .5rem;background:#fff}
@@ -269,13 +269,13 @@ table.t tr:hover td{background:#FDFAF8}
 .box{overflow-x:auto}
 .st i{width:.55rem;height:.55rem;border-radius:50%;display:inline-block}
 .st.pub i{background:var(--ok)} .st.rev i{background:var(--warn)} .st.ras i{background:var(--mut)} .st.des i{background:var(--err)}
-.st.rev{color:#6E4A00;font-weight:600}
+.st.rev{color:#6E4A00;font-weight:600;display:inline-flex} /* .rev também é o layout da fila de revisão */
 .compl{display:flex;align-items:center;gap:.5rem;font-size:.8125rem}
 .compl .b{width:4.5rem;height:.4rem;border-radius:4px;background:var(--line);overflow:hidden}
 .compl .b i{display:block;height:100%;background:var(--ink)}
 .resumo{font-size:.95rem;margin:0 0 1rem}
 .resumo b.big{font-size:1.6rem;color:var(--red-t)}
-.ed{display:grid;grid-template-columns:11rem minmax(0,1fr) 15.5rem;gap:1.25rem;align-items:start}
+.ed{display:grid;grid-template-columns:13.5rem minmax(0,1fr) 15.5rem;gap:1.25rem;align-items:start}
 .ed-nav{position:sticky;top:1rem;font-size:.875rem}
 .ed-nav ol{margin:0;padding:0;list-style:none;counter-reset:b}
 .ed-nav li a{display:flex;gap:.5rem;align-items:center;padding:.35rem .5rem;border-radius:6px;text-decoration:none;color:var(--ink)}
@@ -405,6 +405,9 @@ dialog::backdrop{background:rgba(43,37,35,.42);-webkit-backdrop-filter:blur(4px)
 @media (min-width:900px){.capa{height:100dvh;min-height:40rem}.capa-l{gap:1.1rem;padding-top:2.5rem;padding-bottom:2rem}}
 .capa-foto img{flex:1;min-height:0;width:100%;object-fit:cover;object-position:50% 35%;border-radius:16px;filter:grayscale(1) contrast(1.05);box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .capa-foto figcaption{font-size:.8125rem;font-weight:500}
+img[src*="1-15787"]{object-view-box:inset(4% 4% 11% 4%)} /* postal de 1939: corta a moldura e a régua de cor do scan */
+.ph-img.noimg{aspect-ratio:auto;min-height:9rem}
+.dl-imp div{grid-template-columns:minmax(0,1fr) auto!important}
 .capa-l > *{animation:rise .6s var(--ease) both}
 .capa-l > *:nth-child(2){animation-delay:.05s} .capa-l > *:nth-child(3){animation-delay:.1s} .capa-l > *:nth-child(4){animation-delay:.15s} .capa-l > *:nth-child(5){animation-delay:.2s}
 .capa-r h2{font-size:1.4rem;letter-spacing:-.02em}
@@ -453,7 +456,7 @@ dialog::backdrop{background:rgba(43,37,35,.42);-webkit-backdrop-filter:blur(4px)
 .salvos li{display:grid;grid-template-columns:5rem minmax(0,1fr) auto;gap:1rem;align-items:center;padding:.8rem 0;border-bottom:1px solid var(--line)}
 .salvos .th{width:5rem;height:4rem;border-radius:10px;overflow:hidden;background:var(--bg2)}
 .salvos .th img{width:100%;height:100%;object-fit:cover}
-.rcards{list-style:none;margin:1.5rem 0 2rem;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(17rem,1fr));gap:1rem}
+.rcards{list-style:none;margin:1.5rem 0 2rem;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(17rem,1fr));gap:1rem}
 .rcard{display:flex;flex-direction:column;gap:.75rem;height:100%;padding:1.25rem;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);text-decoration:none;transition:transform .25s cubic-bezier(.32,.72,0,1),box-shadow .25s}
 .rcard:hover{box-shadow:0 10px 28px rgba(43,37,35,.09);transform:translateY(-2px)}
 .rcard:active{transform:scale(.98)}
@@ -632,7 +635,7 @@ const MART = {
 const ROTEIROS_PADRAO = [{ slug:'arranha-ceus-do-centro', nome:'Arranha-céus do Centro',
   resumo:'Do Martinelli ao Edifício Itália, os primeiros prédios altos de São Paulo.',
   apres:'Um passeio a pé pelos primeiros prédios altos de São Paulo, do Martinelli, que abriu a corrida para o alto nos anos 1920, até o Edifício Itália, já na cidade dos anos 1960. O percurso atravessa o Vale do Anhangabaú pelo Viaduto do Chá.',
-  paradas:[['edificio-martinelli','O ponto de partida: o primeiro arranha-céu da cidade e o fio desta visita.'],['edificio-altino-arantes','A duas quadras, o prédio que tirou do Martinelli o posto de mais alto de São Paulo, em 1947.'],['edificio-sampaio-moreira','Anterior ao Martinelli, é um dos precursores da verticalização na Rua Líbero Badaró.'],['edificio-italia','Do outro lado do Viaduto do Chá, o arranha-céu que encerra o percurso.']]
+  paradas:[['edificio-martinelli','O ponto de partida: o arranha-céu mais conhecido do Centro e o fio desta visita.'],['edificio-altino-arantes','A duas quadras, o prédio que tirou do Martinelli o posto de mais alto de São Paulo, em 1947.'],['edificio-sampaio-moreira','Anterior ao Martinelli, é um dos precursores da verticalização na Rua Líbero Badaró.'],['edificio-italia','Do outro lado do Viaduto do Chá, o arranha-céu que encerra o percurso.']]
  }, { slug:'onde-a-cidade-nasceu', nome:'Onde a cidade nasceu',
   resumo:'Do Mosteiro de São Bento à Catedral da Sé, pelo núcleo mais antigo de São Paulo.',
   apres:'Um passeio curto pelo núcleo mais antigo de São Paulo, entre o Largo de São Bento e a Praça da Sé. O percurso passa pelo lugar onde os jesuítas fundaram a vila e por um dos poucos casarões que restam da cidade colonial.',
@@ -640,7 +643,7 @@ const ROTEIROS_PADRAO = [{ slug:'arranha-ceus-do-centro', nome:'Arranha-céus do
 }, { slug:'em-volta-do-anhangabau', nome:'Em volta do Anhangabaú',
   resumo:'Do Theatro Municipal ao Martinelli, dos dois lados do Viaduto do Chá.',
   apres:'Um percurso pelos dois lados do Vale do Anhangabaú, ligados pelo Viaduto do Chá. Começa no Theatro Municipal e termina no Martinelli, passando pela sede da Prefeitura.',
-  paradas:[['theatro-municipal','Inaugurado em 1911 e palco da Semana de Arte Moderna de 1922.'],['edificio-matarazzo','Antiga sede das Indústrias Matarazzo, projetada por Marcello Piacentini. Hoje abriga a Prefeitura.'],['edificio-sampaio-moreira','Na Rua Líbero Badaró, um dos precursores da verticalização, anterior ao Martinelli.'],['edificio-martinelli','O fim do passeio: o primeiro arranha-céu da cidade e o fio desta visita.']]
+  paradas:[['theatro-municipal','Inaugurado em 1911 e palco da Semana de Arte Moderna de 1922.'],['edificio-matarazzo','Antiga sede das Indústrias Matarazzo, projetada por Marcello Piacentini. Hoje abriga a Prefeitura.'],['edificio-sampaio-moreira','Na Rua Líbero Badaró, um dos precursores da verticalização, anterior ao Martinelli.'],['edificio-martinelli','O fim do passeio: o arranha-céu mais conhecido do Centro.']]
 }];
 // roteiros editáveis no painel (Taxonomia e filtros); a demo guarda as mudanças na sessão
 const ROTEIROS = store.get('ep-rots', null) || ROTEIROS_PADRAO.map(r => ({ ...r, st:'publicado' }));
@@ -796,7 +799,8 @@ function pgCapa() {
     <h2>Escolha um perfil para navegar</h2>
     <ul class="perfis">${perfis.map(([k, t, d, c]) => `<li><button data-role="${k}" class="${c || ''}"><b>${t}</b><span class="d">${d}</span><span class="ar">${ic('arrow')}</span></button></li>`).join('')}</ul>
     <p style="margin:0"><a href="#/modulos" style="font-weight:600;color:var(--red-t)">Como o projeto se divide em módulos ${ic('arrow')}</a></p>
-    <p class="nota">Protótipo navegável feito pelo NTec da Poli Júnior, revisto depois da AT de 20/11/2026. Cada perfil vê só as próprias telas; o botão "Trocar perfil" fica sempre visível. Só o Edifício Martinelli tem dados conferidos; os demais bens e pontos do mapa são amostra. <button class="btn sm" data-act="reset" style="margin-top:.5rem">Reiniciar a demonstração</button></p>
+    <p class="nota">Protótipo navegável feito pelo NTec da Poli Júnior, revisto depois da AT de 20/11/2026. Cada perfil vê só as próprias telas; o botão "Trocar perfil" fica sempre visível. Só o Edifício Martinelli tem dados conferidos; os demais bens e pontos do mapa são amostra.</p>
+    <p style="margin:0"><button class="btn sm" data-act="reset">Reiniciar a demonstração</button></p>
   </section></div>`;
 }
 
@@ -833,7 +837,7 @@ function renderMapUI() {
     <button class="btn" id="bFil" data-act="filtros" aria-expanded="${S.filtrosAbertos}">${ic('filter')} Filtros ${nf ? `<span class="n">${nf}</span>` : ''}</button>
     <button class="btn" id="bPerto" data-act="perto" aria-pressed="${f.near}">${ic('locate')} Perto de mim</button></div>
   ${S.filtrosAbertos ? filtrosHTML() : ''}
-  <section class="legenda ${S.legMin ? 'min' : ''}" aria-label="Contadores do acervo e legenda" ${S.sel && innerWidth < 900 ? 'hidden' : ''}>
+  <section class="legenda ${S.legMin ? 'min' : ''}" aria-label="Contadores do acervo e legenda" ${(S.sel && innerWidth < 900) || S.filtrosAbertos ? 'hidden' : ''}>
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem"><div><span class="tot">${fmt(arr.length)}</span> ${arr.length === BENS.length ? 'bens tombados na cidade' : 'bens no recorte, de 2.500'}</div>
     <button class="btn sm ghost only-m" id="bLeg" data-act="leg" aria-expanded="${!S.legMin}">${S.legMin ? 'Legenda' : 'Ocultar'}</button></div>
     <ul>${Object.entries(INST).map(([k, v]) => `<li><span class="inst ${v.cls}"><i></i>${v.rot}</span><b>${fmt(cnt(arr, b => temInst(b, k)))}</b></li>`).join('')}</ul>
@@ -882,7 +886,7 @@ function pgBem(slug) {
   const full = slug === 'edificio-martinelli', t = T[S.lang], fo = fotosDe(b), top = ORG[b.org.includes('iphan') ? 'iphan' : b.org.includes('condephaat') ? 'condephaat' : 'conpresp'];
   const ni = `<span class="ni">${t.ni}</span>`, cab = n => `<span class="eyebrow">${n} · ${t.b[n - 1]}</span>`;
   const ftParcial = [['Denominação oficial', b.nome], ['Endereço completo', b.end], ['Distrito', DNOME[b.d]], ['Autor ou projetista', b.arq], ['Tipologia', b.tip], ['Estilo arquitetônico', b.est], ['Instância e órgão', b.org.map(o => INST[ORG[o].inst].rot + ': ' + ORG[o].sigla).join('; ')]].filter(r => r[1]);
-  const proximos = BENS.filter(x => x !== b).map(x => [x, dist([b.lng, b.lat], [x.lng, x.lat])]).filter(x => x[1] <= 500).sort((a, c) => (c[0].named - a[0].named) || a[1] - c[1]).slice(0, 6);
+  const proximos = BENS.filter(x => x !== b).map(x => [x, dist([b.lng, b.lat], [x.lng, x.lat])]).filter(x => x[1] <= 500).sort((a, c) => (!!c[0].named - !!a[0].named) || a[1] - c[1]).slice(0, 6);
   const v = full && S.mart.ver;
   const arqP = fo.arq[0], atP = fo.at[0];
   const ph = (im, lab) => im ? `<figure><div class="ph-img" data-act="zoom" data-src="${im.src}" data-alt="${im.alt}" role="button" tabindex="0" aria-label="Ampliar: ${im.alt}"><span class="lab">${lab} · ${im.data.slice(-4)}</span>${imgTag(im)}</div><figcaption class="cr">${im.data} · ${im.cred} · ${im.lic}</figcaption></figure>`
@@ -891,8 +895,8 @@ function pgBem(slug) {
   const cmp = S.cmp === 'cmp' && arqP && atP && innerWidth >= 900;
   return hdr('bem') + `<div class="wrap" lang="${S.lang === 'pt' ? 'pt-BR' : S.lang}">
   <nav class="crumbs" aria-label="Você está em"><a href="#/">Cidade de São Paulo</a>›<a href="#/distrito/${b.d}/">Distrito ${DNOME[b.d]}</a>${b.log ? `›<a href="#/logradouro/${b.log}/">${b.logN}</a>` : ''}›<span aria-current="page">${b.nome}</span></nav>
-  <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center"><span class="rota">/bem/${slug}/</span> ${modTag(1)}
-    <div class="lang" role="group" aria-label="Idioma">${modMn(3)}${['pt','en','es'].map(l => `<button data-lang="${l}" aria-pressed="${S.lang === l}">${l.toUpperCase()}</button>`).join('')}</div></div>
+  <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center"><span style="display:inline-flex;gap:.5rem;align-items:center;flex-wrap:wrap"><span class="rota">/bem/${slug}/</span>${modTag(1)}</span>
+    <span style="display:inline-flex;gap:.5rem;align-items:center">${modTag(3)}<div class="lang" role="group" aria-label="Idioma">${['pt','en','es'].map(l => `<button data-lang="${l}" aria-pressed="${S.lang === l}">${l.toUpperCase()}</button>`).join('')}</div></span></div>
   ${t.aviso ? `<p class="ex-banner">${ic('alert')}<span>${t.aviso}</span></p>` : ''}
 
   <section class="f-head" aria-labelledby="h1">
@@ -912,16 +916,16 @@ function pgBem(slug) {
 
   <section class="bloco" aria-labelledby="b3">${cab(3)}<h2 id="b3">${t.b[2]} ${full ? '<span class="tag ex" style="vertical-align:middle">texto de exemplo, curadoria do Movimento SP Restauro e Memória</span>' : ''}</h2>
     ${full ? `<div class="prose">${S.mart.textoPub || MART.texto}</div>
-    <aside class="sugbox"><span class="tag sug">sugestão, fora do TR</span><p style="margin:.5rem 0 .25rem"><b>Bloco opcional "Detalhes"</b>: pequenas seções sobre um elemento do prédio (o coroamento, o saguão, as esquadrias), com foto própria, dentro do texto curatorial e sem mudar a ordem dos blocos.</p><p class="small mut" style="margin:0">Faz sentido para a curadoria? Se sim, entra no dicionário de campos.</p></aside>` : `<p>${ni}: texto curatorial em produção pela curadoria.</p>`}
+    <aside class="sugbox"><span class="tag sug">sugestão, fora do TR</span><p style="margin:.5rem 0 .25rem"><b>Bloco opcional "Detalhes"</b>: pequenas seções sobre um elemento do prédio (o coroamento, o saguão, as esquadrias), com foto própria, dentro do texto curatorial e sem mudar a ordem dos blocos.</p><p class="small mut" style="margin:0">Faz sentido para a curadoria? Se sim, entra no dicionário de campos.</p></aside>` : `<p class="mut">Texto curatorial em produção pela curadoria.</p>`}
   </section>
 
   <section class="bloco" aria-labelledby="b4">${cab(4)}<h2 id="b4">${t.b[3]}</h2>
-    ${full ? `<ol class="tl">${MART.tl.map(([a, d, tb]) => `<li class="${tb ? 'tb' : ''}"><b>${a}</b><span>${d}</span></li>`).join('')}</ol>` : `<p>${ni}: marcos ainda não cadastrados.</p>`}
+    ${full ? `<ol class="tl">${MART.tl.map(([a, d, tb]) => `<li class="${tb ? 'tb' : ''}"><b>${a}</b><span>${d}</span></li>`).join('')}</ol>` : `<p class="mut">Marcos ainda não cadastrados.</p>`}
   </section>
 
   <section class="bloco" aria-labelledby="b5">${cab(5)}<h2 id="b5">${t.b[4]}</h2>
     <dl class="ft">${(full ? ftMart() : ftParcial).map(([k, val]) => `<div><dt>${k}</dt><dd>${k === 'Autor ou projetista' ? `${val} <span class="tag sug" title="Página de arquiteto: sugestão fora do TR">página do arquiteto: sugestão</span>` : val}</dd></div>`).join('')}</dl>
-    ${full ? '' : '<p class="small mut">Campos sem dado ficam ocultos, como pede o TR.</p>'}
+    ${full ? '' : '<p class="small mut">Na ficha técnica, campos sem dado ficam ocultos.</p>'}
   </section>
 
   <section class="bloco" aria-labelledby="b6">${cab(6)}<h2 id="b6">${t.b[5]}</h2>
@@ -1001,7 +1005,7 @@ function pgDistrito(slug) {
   <div class="ltools"><h2 style="font-size:1.25rem">Todos os bens do distrito</h2><label class="small">Ordenar por <select id="ordD" data-act-change="ord">${[['rel','Relevância'],['nome','Ordem alfabética'],['tomb','Ano de tombamento']].map(([k, t]) => `<option value="${k}" ${S.distOrd === k ? 'selected' : ''}>${t}</option>`).join('')}</select></label></div>
   ${listaHTML(lista.slice((pg - 1) * POR, pg * POR))}
   <div class="pag"><button class="btn sm" data-pag="${pg - 1}" ${pg <= 1 ? 'disabled' : ''}>Anterior</button><span>Página ${pg} de ${pags} · ${fmt(n)} bens</span><button class="btn sm" data-pag="${pg + 1}" ${pg >= pags ? 'disabled' : ''}>Próxima</button></div>
-  <footer class="pfoot"><span>Página indexável por distrito (nível 1 do TR), com URL própria.</span>${patHTML()}</footer>
+  <footer class="pfoot"><span>Conteúdo: Movimento São Paulo Restauro e Memória</span>${patHTML()}</footer>
   </div>`;
 }
 function posDistrito(slug) {
@@ -1013,8 +1017,9 @@ function pgLogradouro(slug) {
   const arr = NAMED.filter(b => b.log === slug).map(b => BY[b.slug]); if (!arr.length) return pgNaoEncontrada();
   const b0 = arr[0];
   return hdr('distrito') + `<div class="wrap"><nav class="crumbs" aria-label="Você está em"><a href="#/">Cidade de São Paulo</a>›<a href="#/distrito/${b0.d}/">Distrito ${DNOME[b0.d]}</a>›<span aria-current="page">${b0.logN}</span></nav><span class="rota">/logradouro/${slug}/</span> ${modTag(2)}
-  <h1 style="font-size:2rem;margin:1rem 0 .5rem">Bens tombados na ${b0.logN}</h1><p class="mut">Nível 2 do TR: recorte de rua, com número e lado da via. Nesta amostra, só o Martinelli está ligado ao logradouro.</p>
-  ${listaHTML(arr, true)}</div>`;
+  <h1 style="font-size:2rem;margin:1rem 0 .5rem">Bens tombados na ${b0.logN}</h1><p class="mut">Recorte por rua, com número e lado da via. Nesta amostra, só o Martinelli está ligado ao logradouro.</p>
+  ${listaHTML(arr, true)}
+  <footer class="pfoot"><span>Conteúdo: Movimento São Paulo Restauro e Memória</span>${patHTML()}</footer></div>`;
 }
 </script>
 <script>
@@ -1069,7 +1074,7 @@ function posRoteiro(slug) {
 
 /* ================= tela 6: sobre ================= */
 function pgSobre() {
-  return hdr('sobre') + `<div class="wrap"><span class="rota">/sobre/</span> ${modTag(1)}<div class="prose" style="margin-top:1rem">
+  return hdr('sobre') + `<div class="wrap"><nav class="crumbs" aria-label="Você está em"><a href="#/">Cidade de São Paulo</a>›<span aria-current="page">Sobre</span></nav><span class="rota">/sobre/</span> ${modTag(1)}<div class="prose" style="margin-top:1rem">
   <h1 style="font-size:2.25rem;margin-bottom:1rem">Sobre o Encontro com o Patrimônio</h1>
   <p>São Paulo tem cerca de 2.500 bens tombados nas três instâncias de proteção. Até aqui, eles estavam espalhados em listas com critérios e formatos diferentes. Este site reúne todos num mapa só e dá a cada um uma ficha curatorial.</p>
   <h3>De onde vêm os dados</h3><p>A localização e o enquadramento legal vêm das listas do Conpresp (municipal), do Condephaat (estadual) e do IPHAN (federal), cadastradas e conferidas pela equipe de curadoria. Quando o mesmo bem é protegido por mais de um órgão, ele aparece uma vez só, com todos os órgãos.</p>
@@ -1109,7 +1114,7 @@ const LINHAS = [
   ['patio-do-colegio','Marina Okabe','14/10/2026'],['mosteiro-de-sao-bento','Thiago Brandão','07/10/2026'],['edificio-italia','Marina Okabe','30/09/2026'],['solar-da-marquesa-de-santos','Thiago Brandão','23/09/2026']];
 function stOf(slug) { if (slug === 'edificio-martinelli') return S.mart.status; if (S.fila.includes(slug)) return 'revisao'; if (novoDe(slug)) return novoDe(slug).st; if (['edificio-altino-arantes','edificio-prudencia'].includes(slug)) return 'rascunho'; return 'publicado'; }
 const ST = { publicado:['pub','Publicado'], rascunho:['ras','Rascunho'], revisao:['rev','Em revisão'], despublicado:['des','Despublicado'] };
-const stHTML = (s, slug) => `<span class="st ${ST[s][0]}"><i></i>${ST[s][1]}${s !== 'publicado' && s !== 'despublicado' ? `<br><span class="small mut" style="font-weight:400">${slug && novoDe(slug) ? 'ainda não está no site' : 'versão anterior no site'}</span>` : ''}</span>`;
+const stHTML = (s, slug) => `<span class="st ${ST[s][0]}"><i></i>${ST[s][1]}${s !== 'publicado' && s !== 'despublicado' ? `<span class="small mut" style="font-weight:400;flex-basis:100%;padding-left:1rem">${slug && novoDe(slug) ? 'ainda não está no site' : 'versão anterior no site'}</span>` : ''}</span>`;
 function compl(slug) { const n = slug === 'edificio-martinelli' ? 9 : slug === 'edificio-altino-arantes' ? 6 : slug === 'edificio-prudencia' ? 5 : novoDe(slug) ? 2 : 4, fo = fotosDe(BY[slug]);
   return `<span class="compl"><span class="b"><i style="width:${(n / 9 * 100).toFixed(1)}%"></i></span>${n}/9</span><span class="small mut" style="display:block">arquivo ${fo.arq.length ? 'sim' : 'não'} · atual ${fo.at.length ? 'sim' : 'não'}</span>`; }
 function pgBens() {
@@ -1166,7 +1171,7 @@ function pgEditor() {
   <aside class="ed-aside"><div class="box"><h3>Prévia</h3><div class="prev-tabs"><button class="btn sm" data-prev="m" aria-pressed="${S.prev !== 'd'}">Celular</button><button class="btn sm" data-prev="d" aria-pressed="${S.prev === 'd'}">Computador</button></div>
     <div class="prev ${S.prev === 'd' ? 'd' : 'm'}"><div class="pv-h"></div><div class="pv-b"><b>Edifício Martinelli</b>Rua São Bento, 405 · Sé<div class="pv-pair"><img src="${IMG.martArq.src}" alt=""><img src="${IMG[m.novaImg ? 'martAt2' : 'martAt'].src}" alt=""></div>${MART.resumo}</div></div></div>
 </aside></div>
-  <div id="ed-tec" ${tec ? '' : 'hidden'}><section class="box ed-sec" id="ebt" style="max-width:52rem"><h2>Base técnica <span class="tag tec">não aparece no site</span></h2>
+  <div id="ed-tec" ${tec ? '' : 'hidden'}><section class="box ed-sec" id="ebt"><h2>Base técnica <span class="tag tec">não aparece no site</span></h2>
     <p class="mut" style="margin:.25rem 0 1rem">Avaliações internas da curadoria, para pesquisa e para o projeto técnico sobre a mesma base. Mudanças aqui também passam pela fila de revisão.</p>
     <h3 style="font-size:1rem;margin:0 0 .5rem">Estado de conservação</h3><div class="g2"><div class="field"><label for="e-cons">Nível (1 a 5)</label><select id="e-cons" data-k="cons" ${bloq ? 'disabled' : ''}>${[1, 2, 3, 4, 5].map(k => `<option value="${k}" ${String(d.cons) === String(k) ? 'selected' : ''}>${k} · ${CONS[k].rot}</option>`).join('')}</select></div>${f('vistoria', 'Data da última vistoria')}</div>
     <p class="small mut" style="margin:0 0 1rem">A escala de 5 níveis, com o critério de cada um, fica em Taxonomia e filtros.</p>
@@ -1193,8 +1198,8 @@ function salvar(enviar) {
 }
 
 /* ===== tela 9: fila de revisão ===== */
-const FILA_INFO = { 'edificio-sampaio-moreira':['Thiago Brandão','13/11/2026','v3',[['5 · Ano de construção','não informado','dado de amostra'],['2 · Par de imagens',null,'Nova foto atual (amostra)']]],
-  'theatro-municipal':['Marina Okabe','12/11/2026','v5',[['6 · Condições de visita','dado de amostra antigo','dado de amostra novo']]] };
+const FILA_INFO = { 'edificio-sampaio-moreira':['Thiago Brandão','13/11/2026','v3',[['5 · Ano de construção','não informado','1924 (amostra, a conferir)'],['2 · Par de imagens',null,'Nova foto atual: fachada da Rua Líbero Badaró (amostra)']]],
+  'theatro-municipal':['Marina Okabe','12/11/2026','v5',[['6 · Condições de visita','Visitas guiadas: consultar a programação','Visitas guiadas de terça a domingo, com agendamento (amostra)']]] };
 /* ===== novo bem ===== */
 function infoNovo(b) {
   return [b.autor, b.em, 'v1', [['1 · Identificação', null, `${b.nome}. ${b.end}, distrito ${DNOME[b.d]}.`], ['5 · Ficha técnica', null, `${b.tip} · ${b.per}${b.est ? ' · ' + b.est : ''} · proteção: ${b.org.map(o => ORG[o].sigla).join(', ')}${b.res ? ` · ${b.res}` : ''}`]]];
@@ -1332,7 +1337,7 @@ function pgTax() {
         <label class="sr" for="pt${i}">Texto da parada ${i + 1}</label><textarea id="pt${i}" data-pt="${i}" rows="2" placeholder="O que contar nesta parada">${ea(txt)}</textarea></div></li>`).join('') || '<li style="display:block" class="mut">Nenhuma parada ainda.</li>'}</ol></div>`; }
     body = `<div class="rev">${lista}${ed}</div>`; }
   return adm('taxonomia', `<div class="adm-top"><div><h1>Taxonomia e filtros ${modTag(1)}</h1><p>Define o que aparece nos filtros do mapa e nos roteiros. Rota: <span class="rota">/painel/taxonomia</span></p></div></div>
-  <div class="tabs" role="tablist">${tabs.map(([k, t]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${t}${k === 'rot' ? modMn(3) : ''}</button>`).join('')}</div>${tab === 'rot' ? body : `<div class="box">${body}</div>`}`);
+  <div class="tabs" role="tablist">${tabs.map(([k, t]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${t}${k === 'rot' ? modMn(3) : ''}</button>`).join('')}</div>${tab === 'rot' ? body : `<div class="box" style="max-width:60rem">${body}</div>`}`);
 }
 
 /* ===== patrocínio (só administração) ===== */
@@ -1401,9 +1406,9 @@ function dlg(html) { const d = $('#dlg'); d.innerHTML = html; if (!d.open) d.sho
 function dlgImport() {
   const s = S.imp, passos = ['Arquivo','Colunas','Conferência'];
   const cab = `<div class="dlg-h"><h2 style="font-size:1.15rem">Importar planilha</h2><button class="btn sm ghost" data-act="fecharDlg" aria-label="Fechar">${ic('x')}</button></div><div class="dlg-b"><p class="steps">${passos.map((p, i) => i + 1 === s ? `<b>${i + 1}. ${p}</b>` : `${i + 1}. ${p}`).join(' › ')}</p>`;
-  if (s === 1) return dlg(cab + `<div class="drop">${ic('upload')}<p style="margin:.5rem 0">Arraste a planilha (CSV ou XLSX) ou clique para escolher.</p><button class="btn pri" data-act="imp2">Usar o arquivo de exemplo: planilha-curadoria-exemplo.csv</button></div><p class="small mut">A planilha serve para cadastrar e corrigir bens em lote, a partir das listas que a curadoria já organiza.</p></div>`);
+  if (s === 1) return dlg(cab + `<div class="drop">${ic('upload')}<p style="margin:.5rem 0">Arraste a planilha (CSV ou XLSX) ou clique para escolher.</p><button class="btn pri" data-act="imp2">Usar o arquivo de exemplo: planilha-curadoria-exemplo.csv</button></div><p class="small mut">A planilha serve para cadastrar e corrigir bens em lote, a partir das listas que a curadoria já organiza.</p></div><div class="dlg-f"><button class="btn" data-act="fecharDlg">Cancelar</button></div>`);
   if (s === 2) return dlg(cab + `<table class="t"><thead><tr><th>Coluna da planilha</th><th>Campo da ficha</th></tr></thead><tbody>${[['nm_bem','Denominação oficial'],['tx_endereco','Endereço completo'],['nm_distrito','Distrito'],['sg_orgao','Órgão de tombamento'],['nr_resolucao','Resolução'],['nr_processo','Número do processo'],['cd_x / cd_y','Coordenadas']].map(([a, b]) => `<tr><td><code>${a}</code></td><td>${b}</td></tr>`).join('')}</tbody></table><p class="small mut">Nomes de coluna ilustrativos; a curadoria escolhe o modelo da planilha.</p></div><div class="dlg-f"><button class="btn" data-act="imp1">Voltar</button><button class="btn pri" data-act="imp3">Conferir dados</button></div>`);
-  dlg(cab + `<dl class="ft" style="grid-template-columns:1fr"><div><dt>Linhas lidas</dt><dd>2.618</dd></div><div><dt>Linhas do mesmo bem em mais de um órgão, unidas</dt><dd>118</dd></div><div><dt>Bens depois da união</dt><dd><b>2.500</b></dd></div><div><dt>Com coordenada válida</dt><dd>2.431</dd></div><div><dt>Sem coordenada (vão para geocodificação, com conferência manual)</dt><dd>69</dd></div><div><dt>Erros de formato</dt><dd>0</dd></div></dl></div>
+  dlg(cab + `<dl class="ft dl-imp" style="grid-template-columns:1fr"><div><dt>Linhas lidas</dt><dd>2.618</dd></div><div><dt>Linhas do mesmo bem em mais de um órgão, unidas</dt><dd>118</dd></div><div><dt>Bens depois da união</dt><dd><b>2.500</b></dd></div><div><dt>Com coordenada válida</dt><dd>2.431</dd></div><div><dt>Sem coordenada (vão para geocodificação, com conferência manual)</dt><dd>69</dd></div><div><dt>Erros de formato</dt><dd>0</dd></div></dl></div>
   <div class="dlg-f"><button class="btn" data-act="imp2">Voltar</button><button class="btn pri" data-act="impOk">Importar 2.500 bens</button></div>`);
 }
 function baixar(nome, txt, tipo) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type:tipo })); a.download = nome; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }
