@@ -1,0 +1,1579 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Encontro com o Patrimônio · protótipo navegável</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+:root{
+  --red:#E8402A; --red-t:#B92E1B; --red-d:#A82616; --red-bg:#FCEAE6;
+  --ink:#2B2523; --mut:#6B605C; --bg:#FBF7F4; --bg2:#F6EFEA; --card:#fff; --line:#E7DDD6; --line2:#D6C8BF;
+  --mun:#0F766E; --est:#A15C07; --fed:#1D4E89;
+  --c1:#1E7A3C; --c2:#4F6B1A; --c3:#9A6700; --c4:#B4531A; --c5:#A82616;
+  --ok:#1E7A3C; --ok-bg:#E6F2EA; --warn:#9A6700; --warn-bg:#FBF1DC; --err:#A82616; --err-bg:#FCEAE6;
+  --focus:#1D4E89; --r:8px;
+}
+html{font-size:100%}
+*{box-sizing:border-box}
+body{margin:0;font-family:Poppins,system-ui,sans-serif;font-size:1rem;line-height:1.5;color:var(--ink);background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--red-t)}
+h1,h2,h3{line-height:1.15;margin:0}
+img{max-width:100%;display:block}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ico{width:1.15em;height:1.15em;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-height:2.5rem;padding:.4rem .9rem;border:1px solid var(--line2);background:#fff;border-radius:var(--r);font-weight:500;cursor:pointer;text-decoration:none;color:var(--ink);white-space:nowrap}
+.btn:hover{border-color:var(--red-t);color:var(--red-t)}
+.btn.pri{background:var(--red-t);border-color:var(--red-t);color:#fff}
+.btn.pri:hover{background:var(--red-d);color:#fff}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.sm{min-height:2rem;padding:.2rem .6rem;font-size:.875rem}
+.btn[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.mut{color:var(--mut)}
+.small{font-size:.875rem}
+.tag{display:inline-flex;align-items:center;gap:.3rem;font-size:.75rem;font-weight:600;padding:.1rem .5rem;border-radius:4px;border:1px solid currentColor;line-height:1.5}
+.ex{color:var(--warn);background:var(--warn-bg);border-color:#E9CF94}
+.sug{color:var(--fed);background:#E8EFF8;border-color:#B7C9E2;border-style:dashed}
+.mod{color:var(--mut);background:transparent;border-color:var(--line2);font-weight:500;white-space:nowrap}
+.mn{font-size:.6875rem;font-weight:600;color:var(--mut);margin-left:.3rem;letter-spacing:.02em}
+.adm-side .mn{color:#B8ABA4;margin-left:auto}
+.tec{color:#5A4E49;background:#F1ECE8;border-color:#D8CDC6}
+.pat-blk{display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:var(--r);padding:1rem 1.25rem;background:#fff;max-width:40rem}
+.pat-blk p{margin:.15rem 0}
+.mods{list-style:none;margin:0;padding:0;max-width:52rem}
+.mods>li{border-top:1px solid var(--line);padding:1.5rem 0}
+.mods h2{font-size:1.25rem;margin:.25rem 0 .5rem}
+.mods ul{margin:.5rem 0 0;padding-left:1.1rem}
+.mods li li{margin:.3rem 0}
+.inst{display:inline-flex;align-items:center;gap:.35rem;font-size:.8125rem;font-weight:600}
+.inst i{width:.7rem;height:.7rem;border-radius:50%;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px currentColor}
+.inst.mun{color:var(--mun)} .inst.mun i{background:var(--mun)}
+.inst.est{color:var(--est)} .inst.est i{background:var(--est)}
+.inst.fed{color:var(--fed)} .inst.fed i{background:var(--fed)}
+.cons{display:inline-flex;align-items:center;gap:.4rem;font-weight:600;font-size:.875rem}
+.cons b{display:inline-grid;place-items:center;width:1.4rem;height:1.4rem;border-radius:4px;color:#fff;font-size:.75rem}
+.k1{color:var(--c1)} .k1 b{background:var(--c1)} .k2{color:var(--c2)} .k2 b{background:var(--c2)}
+.k3{color:var(--c3)} .k3 b{background:var(--c3)} .k4{color:var(--c4)} .k4 b{background:var(--c4)} .k5{color:var(--c5)} .k5 b{background:var(--c5)}
+.selo-pat{display:inline-flex;flex-direction:column;align-items:flex-start;gap:.15rem;font-size:.6875rem;color:var(--mut);letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+.selo-pat span{display:grid;place-items:center;min-width:7.5rem;height:2.25rem;border:1px dashed var(--line2);border-radius:6px;background:#fff;font-size:.75rem;text-transform:none;letter-spacing:0;font-weight:500;color:var(--mut);padding:0 .5rem}
+#toast{position:fixed;left:50%;bottom:1.5rem;transform:translateX(-50%);z-index:100;background:var(--ink);color:#fff;padding:.6rem 1rem;border-radius:var(--r);font-size:.9rem;max-width:calc(100vw - 2rem);box-shadow:0 6px 20px rgba(0,0,0,.2)}
+dialog{border:1px solid var(--line);border-radius:12px;padding:0;max-width:min(42rem,calc(100vw - 2rem));width:100%;color:var(--ink)}
+dialog::backdrop{background:rgba(43,37,35,.55)}
+.dlg-h{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.25rem;border-bottom:1px solid var(--line)}
+.dlg-b{padding:1.25rem}
+.dlg-f{display:flex;justify-content:flex-end;gap:.5rem;padding:1rem 1.25rem;border-top:1px solid var(--line)}
+.field{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.9rem}
+.field label,.lbl{font-weight:600;font-size:.875rem}
+.field input,.field select,.field textarea{border:1px solid var(--line2);border-radius:6px;padding:.5rem .6rem;background:#fff;min-height:2.5rem;width:100%}
+.field.bad input,.field.bad select,.field.bad textarea{border-color:var(--err);box-shadow:0 0 0 1px var(--err)}
+.ferr{color:var(--err);font-size:.8125rem;font-weight:500;display:flex;gap:.3rem;align-items:center}
+.req{color:var(--err)}
+
+/* ===== capa / escolha de perfil ===== */
+.capa{min-height:100dvh;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.capa-l{background:var(--red);color:#fff;padding:3rem clamp(1.25rem,5vw,4rem);display:flex;flex-direction:column;gap:1.5rem}
+.capa-l .org{font-weight:700;font-size:.875rem;letter-spacing:.06em;text-transform:uppercase}
+.capa-l h1{font-size:clamp(2.2rem,5.2vw,4rem);font-weight:700;letter-spacing:-.02em;line-height:1.02}
+.capa-l p.lead{font-size:clamp(1.1rem,1.6vw,1.35rem);font-weight:600;max-width:30rem;margin:0}
+.capa-l .meta{margin-top:auto;display:flex;flex-wrap:wrap;gap:1.5rem;align-items:flex-end;justify-content:space-between}
+.capa-l .meta .selo-pat{color:#fff}
+.capa-l .meta .selo-pat span{background:transparent;border-color:rgba(255,255,255,.8);color:#fff}
+.capa-l .num{font-size:1rem;font-weight:600}
+.capa-l .num b{display:block;font-size:2.4rem;line-height:1}
+.capa-r{background:#fff;padding:3rem clamp(1.25rem,4vw,3.5rem);display:flex;flex-direction:column;justify-content:center;gap:1rem}
+.capa-r h2{font-size:1.25rem;color:var(--red-t)}
+.perfis{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.perfis button{width:100%;text-align:left;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.15rem 1rem;align-items:center;padding:1rem .25rem;border:0;border-bottom:1px solid var(--line);background:none;cursor:pointer}
+.perfis button:hover{background:var(--bg)}
+.perfis b{font-size:1.15rem}
+.perfis .d{grid-column:1;color:var(--mut);font-size:.9rem}
+.perfis .ar{grid-row:1/3;grid-column:2;color:var(--red-t)}
+.perfis .pub b{color:var(--red-t)}
+.capa-r .nota{font-size:.8125rem;color:var(--mut);max-width:34rem}
+
+/* ===== cabeçalho público ===== */
+.ph{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.5rem 1rem;padding:.5rem 1rem;flex-wrap:wrap}
+.logo{display:flex;flex-direction:column;border-left:4px solid var(--red);padding-left:.55rem;text-decoration:none;color:var(--ink);line-height:1.1}
+.logo b{font-weight:700;color:var(--red-t);font-size:1rem}
+.logo small{font-size:.6875rem;color:var(--mut);font-weight:500}
+.ph nav{display:flex;gap:.25rem}
+.ph nav a{text-decoration:none;color:var(--ink);font-weight:500;font-size:.9rem;padding:.4rem .6rem;border-radius:6px}
+.ph nav a:hover{background:var(--bg)} .ph nav a.on{color:var(--red-t);box-shadow:inset 0 -2px 0 var(--red-t);border-radius:0}
+.ph .acts{margin-left:auto;display:flex;gap:.35rem;align-items:center;flex-wrap:wrap}
+.perfil-pill{display:inline-flex;align-items:center;gap:.4rem;font-size:.8125rem;border:1px solid var(--line2);border-radius:999px;padding:.25rem .35rem .25rem .7rem;background:var(--bg)}
+.perfil-pill b{font-weight:600}
+.perfil-pill button{border:0;background:var(--ink);color:#fff;border-radius:999px;padding:.25rem .65rem;cursor:pointer;font-size:.8125rem;font-weight:500}
+.search{position:relative;flex:1 1 18rem;max-width:30rem}
+.search input{width:100%;border:1px solid var(--line2);border-radius:var(--r);padding:.55rem .75rem .55rem 2.3rem;background:#fff;min-height:2.6rem}
+.search .ico{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--mut)}
+.sres{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:0 10px 30px rgba(43,37,35,.15);list-style:none;margin:0;padding:.25rem;z-index:40;max-height:22rem;overflow:auto}
+.sres li button{width:100%;text-align:left;border:0;background:none;padding:.5rem .6rem;border-radius:6px;cursor:pointer;display:flex;flex-direction:column}
+.sres li button:hover,.sres li button.act{background:var(--bg2)}
+.sres small{color:var(--mut);font-size:.8125rem}
+.sres .grp{font-size:.6875rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);padding:.4rem .6rem .1rem;font-weight:600}
+
+/* ===== mapa ===== */
+body.mode-map{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+body.mode-map #page{display:none}
+#mapWrap{position:relative;flex:1;min-height:0}
+#map{position:absolute;inset:0;background:#EEE8E3}
+.map-fallback{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:2rem;color:var(--mut)}
+.mtools{position:absolute;top:.75rem;left:.75rem;display:flex;gap:.4rem;flex-wrap:wrap;z-index:5;max-width:calc(100% - 4rem)}
+.mtools .btn{box-shadow:0 2px 6px rgba(43,37,35,.15)}
+.mtools .btn .n{background:var(--red-t);color:#fff;border-radius:999px;font-size:.75rem;padding:0 .45rem}
+.filtros{position:absolute;top:3.75rem;left:.75rem;z-index:6;width:20rem;max-height:calc(100% - 5rem);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:0 10px 30px rgba(43,37,35,.18);padding:1rem}
+.filtros fieldset{border:0;padding:0;margin:0 0 .9rem}
+.filtros legend{font-weight:600;font-size:.875rem;margin-bottom:.35rem}
+.chk{display:flex;align-items:center;gap:.5rem;padding:.2rem 0;font-size:.9rem;cursor:pointer}
+.chk input{width:1.1rem;height:1.1rem;accent-color:var(--red-t)}
+.filtros select{width:100%;border:1px solid var(--line2);border-radius:6px;padding:.45rem;background:#fff}
+.legenda{position:absolute;left:.75rem;bottom:1.75rem;z-index:5;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:.75rem .9rem;box-shadow:0 4px 14px rgba(43,37,35,.12);max-width:19rem;font-size:.875rem}
+.legenda .tot{font-size:1.5rem;font-weight:700;color:var(--red-t);line-height:1}
+.legenda ul{list-style:none;margin:.5rem 0;padding:0;display:flex;flex-direction:column;gap:.2rem}
+.legenda li{display:flex;justify-content:space-between;gap:1rem}
+.legenda .foot{display:flex;justify-content:space-between;align-items:flex-end;gap:.5rem;margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem}
+.amostra{position:absolute;right:.75rem;bottom:1.75rem;z-index:5;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:6px;padding:.25rem .5rem;font-size:.75rem;color:var(--mut);max-width:15rem}
+.side{position:absolute;z-index:8;top:.75rem;right:.75rem;bottom:.75rem;width:25rem;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 36px rgba(43,37,35,.22);display:flex;flex-direction:column;overflow:hidden}
+.side .grab{display:none}
+.side-h{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;padding:1rem 1rem .5rem}
+.side-h h2{font-size:1.35rem}
+.side-b{padding:0 1rem 1rem;overflow:auto}
+.side .pair{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin:.5rem 0}
+.side .pair figure{margin:0}
+.side .pair img,.side .pair .noimg{aspect-ratio:3/4;object-fit:cover;width:100%;border-radius:6px}
+.side .pair figcaption{font-size:.75rem;color:var(--mut);margin-top:.2rem}
+.noimg{display:grid;place-items:center;text-align:center;background:var(--bg2);border:1px dashed var(--line2);color:var(--mut);font-size:.8125rem;padding:.5rem;border-radius:6px}
+.side p{margin:.5rem 0}
+.side .row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+
+/* ===== páginas públicas ===== */
+.wrap{max-width:76rem;margin:0 auto;padding:1.25rem 1rem 3rem}
+.crumbs{font-size:.8125rem;color:var(--mut);display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.75rem}
+.crumbs a{color:var(--mut)}
+.rota{font-family:ui-monospace,Consolas,monospace;font-size:.75rem;color:var(--mut);background:var(--bg2);border-radius:4px;padding:.1rem .4rem}
+.bloco{padding:2rem 0;border-top:1px solid var(--line)}
+.eyebrow{display:block;font-size:.75rem;font-weight:600;color:var(--mut);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.bloco h2{font-size:1.5rem;margin-bottom:1rem}
+.f-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1rem;align-items:start;padding:.5rem 0 1.25rem}
+.f-head h1{font-size:clamp(2rem,4.5vw,3.25rem);letter-spacing:-.02em;color:var(--ink)}
+.f-head .end{font-size:1.1rem;margin:.4rem 0 .75rem;color:var(--mut)}
+.selo-inst{border:2px solid var(--mun);color:var(--mun);border-radius:8px;padding:.5rem .75rem;text-align:center;min-width:8rem}
+.selo-inst b{display:block;font-size:1.05rem}
+.selo-inst small{font-size:.75rem;font-weight:500}
+.selo-inst.est{border-color:var(--est);color:var(--est)} .selo-inst.fed{border-color:var(--fed);color:var(--fed)}
+.ex-banner{display:flex;gap:.5rem;align-items:flex-start;background:var(--warn-bg);border:1px solid #E9CF94;color:#6E4A00;padding:.6rem .8rem;border-radius:6px;font-size:.875rem;margin:.5rem 0}
+.cmp-tabs{display:flex;gap:.35rem;margin-bottom:.75rem}
+.cmp-pair{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.cmp-pair figure{margin:0}
+.ph-img{position:relative;aspect-ratio:4/3;background:var(--bg2);border-radius:8px;overflow:hidden;cursor:zoom-in}
+.ph-img img{width:100%;height:100%;object-fit:cover}
+.ph-img .lab{position:absolute;left:.6rem;top:.6rem;background:var(--ink);color:#fff;font-weight:600;font-size:.8125rem;padding:.15rem .55rem;border-radius:4px}
+figcaption.cr{font-size:.8125rem;color:var(--mut);margin-top:.4rem}
+.cmp-slider{position:relative;aspect-ratio:16/10;border-radius:8px;overflow:hidden;background:var(--bg2);max-width:56rem}
+.cmp-slider img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cmp-slider .top{clip-path:inset(0 50% 0 0)}
+.cmp-slider .bar{position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.3);pointer-events:none}
+.cmp-slider .lab{position:absolute;top:.6rem;background:var(--ink);color:#fff;font-weight:600;font-size:.8125rem;padding:.15rem .55rem;border-radius:4px}
+.cmp-range{width:100%;max-width:56rem;accent-color:var(--red-t);margin-top:.5rem}
+.prose{max-width:44rem;font-size:1.0625rem;line-height:1.65}
+.prose h3{font-size:1.15rem;margin:1.5rem 0 .4rem;color:var(--red-t)}
+.prose p{margin:.5rem 0}
+.sugbox{border:1px dashed #9DB4D6;background:#F3F7FC;border-radius:8px;padding:.9rem 1rem;margin:1.25rem 0;max-width:44rem;font-size:.9375rem}
+.tl{list-style:none;margin:0;padding:0;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(9rem,1fr);gap:0;overflow-x:auto;padding-bottom:.5rem}
+.tl li{position:relative;padding:1.6rem .9rem 0 0;border-top:3px solid var(--line2)}
+.tl li::before{content:"";position:absolute;top:-.55rem;left:0;width:.9rem;height:.9rem;border-radius:50%;background:#fff;border:3px solid var(--red-t)}
+.tl li.tb::before{background:var(--red-t)}
+.tl b{display:block;font-size:1.25rem;color:var(--red-t)}
+.tl span{font-size:.9rem}
+.ft{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 2rem;margin:0;max-width:56rem}
+.ft div{display:grid;grid-template-columns:11rem minmax(0,1fr);gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--line)}
+.ft dt{color:var(--mut);font-size:.875rem}
+.ft dd{margin:0;font-weight:500}
+.escala{display:flex;gap:.25rem;margin:.75rem 0;max-width:36rem}
+.escala span{flex:1;padding:.4rem .3rem;font-size:.75rem;text-align:center;border-radius:4px;background:var(--bg2);color:var(--mut);border:1px solid var(--line)}
+.escala span.on{color:#fff;font-weight:600;border-color:transparent}
+.vis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem 2rem;max-width:56rem;margin:0}
+.vis div{border-bottom:1px solid var(--line);padding:.6rem 0}
+.vis dt{font-size:.875rem;color:var(--mut)} .vis dd{margin:0;font-weight:500}
+.ni{font-style:italic;color:var(--mut);font-weight:400}
+.loc{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1.5rem}
+#miniMap{height:20rem;border-radius:8px;border:1px solid var(--line);background:#EEE8E3}
+.prox{list-style:none;margin:0;padding:0}
+.prox li{display:flex;justify-content:space-between;gap:1rem;padding:.6rem 0;border-bottom:1px solid var(--line)}
+.refs{max-width:56rem;font-size:.9375rem}
+.refs li{margin:.35rem 0}
+.share{display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start}
+.share .acts{display:flex;flex-direction:column;gap:.5rem}
+.permalink{font-family:ui-monospace,Consolas,monospace;font-size:.8125rem;background:var(--bg2);padding:.4rem .6rem;border-radius:6px;word-break:break-all}
+.pfoot{border-top:1px solid var(--line);margin-top:2rem;padding:1.5rem 0;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:flex-end;font-size:.8125rem;color:var(--mut)}
+.lang{display:inline-flex;border:1px solid var(--line2);border-radius:var(--r);overflow:hidden}
+.lang button{border:0;background:#fff;padding:.35rem .55rem;font-size:.8125rem;font-weight:600;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--ink);color:#fff}
+/* distrito, roteiro */
+.dhead{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:1.5rem;align-items:start}
+.dhead h1{font-size:clamp(1.8rem,4vw,2.75rem)}
+#ctxMap{height:16rem;border-radius:8px;border:1px solid var(--line);background:#EEE8E3}
+.ind{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5rem;margin:1.5rem 0}
+.ind h3{font-size:.9375rem;margin-bottom:.4rem}
+.bars{list-style:none;margin:0;padding:0;font-size:.875rem}
+.bars li{display:grid;grid-template-columns:minmax(0,1fr) 3rem;gap:.5rem;align-items:center;padding:.15rem 0}
+.bars .b{height:.5rem;border-radius:4px;background:var(--line);overflow:hidden;grid-column:1/3}
+.bars .b i{display:block;height:100%}
+.bars .v{text-align:right;font-weight:600}
+.lista{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.lista li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:1rem;align-items:center;padding:.8rem 0;border-bottom:1px solid var(--line)}
+.lista a.n{font-weight:600;text-decoration:none;color:var(--ink)} .lista a.n:hover{color:var(--red-t);text-decoration:underline}
+.ltools{display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap;margin:1rem 0 .5rem}
+.ltools select{border:1px solid var(--line2);border-radius:6px;padding:.4rem .5rem;background:#fff}
+.pag{display:flex;gap:.35rem;align-items:center;margin-top:1rem;font-size:.875rem}
+.rot{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:2rem;align-items:start}
+#rotMap{height:26rem;border-radius:8px;border:1px solid var(--line);background:#EEE8E3;position:sticky;top:5rem}
+.paradas{list-style:none;margin:1rem 0 0;padding:0;counter-reset:p}
+.paradas li{display:grid;grid-template-columns:2.25rem minmax(0,1fr);gap:.75rem;padding:1rem 0;border-bottom:1px solid var(--line)}
+.paradas .nn{width:2.25rem;height:2.25rem;border-radius:50%;background:var(--red-t);color:#fff;display:grid;place-items:center;font-weight:700}
+.paradas h3{font-size:1.05rem}
+
+/* ===== painel da equipe ===== */
+.adm{display:grid;grid-template-columns:15rem minmax(0,1fr);min-height:100dvh}
+.adm-side{background:var(--ink);color:#fff;display:flex;flex-direction:column;padding:1.25rem 0;position:sticky;top:0;height:100dvh}
+.adm-side .logo{margin:0 1.25rem 1.25rem;color:#fff;border-color:var(--red)} .adm-side .logo b{color:#fff} .adm-side .logo small{color:#D9CFC9}
+.adm-side nav{display:flex;flex-direction:column;gap:2px;padding:0 .6rem}
+.adm-side nav a{display:flex;align-items:center;gap:.6rem;color:#EDE6E1;text-decoration:none;padding:.55rem .75rem;border-radius:6px;font-size:.9375rem}
+.adm-side nav a:hover{background:rgba(255,255,255,.08)}
+.adm-side nav a.on{background:rgba(255,255,255,.12);color:#fff;box-shadow:inset 3px 0 0 var(--red)}
+.adm-side nav .cnt{margin-left:auto;background:var(--red);color:#fff;font-size:.75rem;font-weight:700;border-radius:999px;padding:0 .45rem}
+.adm-who{margin-top:auto;padding:1rem 1.25rem 0;border-top:1px solid rgba(255,255,255,.14);font-size:.875rem}
+.adm-who b{display:block}
+.adm-who span{color:#D9CFC9}
+.adm-who button{margin-top:.6rem;width:100%;background:#fff;color:var(--ink);border:0;border-radius:6px;padding:.45rem;font-weight:600;cursor:pointer}
+.adm-main{padding:1.5rem 2rem 3rem;min-width:0}
+.adm-top{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;margin-bottom:1rem;flex-wrap:wrap}
+.adm-top h1{font-size:1.6rem}
+.adm-top p{margin:.25rem 0 0;color:var(--mut)}
+.box{background:#fff;border:1px solid var(--line);border-radius:var(--r)}
+.tbar{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;padding:.75rem;border-bottom:1px solid var(--line)}
+.tbar input,.tbar select{border:1px solid var(--line2);border-radius:6px;padding:.4rem .6rem;background:#fff;min-height:2.25rem}
+table.t{width:100%;border-collapse:collapse;font-size:.9rem}
+table.t th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:600;padding:.6rem .75rem;border-bottom:1px solid var(--line);background:var(--bg)}
+table.t td{padding:.65rem .75rem;border-bottom:1px solid var(--line);vertical-align:middle}
+table.t tr:hover td{background:#FDFAF8}
+.st{display:inline-flex;align-items:center;flex-wrap:wrap;gap:0 .35rem;font-size:.8125rem;font-weight:500}
+.st br{flex-basis:100%;content:""}
+.box{overflow-x:auto}
+.st i{width:.55rem;height:.55rem;border-radius:50%;display:inline-block}
+.st.pub i{background:var(--ok)} .st.rev i{background:var(--warn)} .st.ras i{background:var(--mut)} .st.des i{background:var(--err)}
+.st.rev{color:#6E4A00;font-weight:600}
+.compl{display:flex;align-items:center;gap:.5rem;font-size:.8125rem}
+.compl .b{width:4.5rem;height:.4rem;border-radius:4px;background:var(--line);overflow:hidden}
+.compl .b i{display:block;height:100%;background:var(--ink)}
+.resumo{font-size:.95rem;margin:0 0 1rem}
+.resumo b.big{font-size:1.6rem;color:var(--red-t)}
+.ed{display:grid;grid-template-columns:11rem minmax(0,1fr) 15.5rem;gap:1.25rem;align-items:start}
+.ed-nav{position:sticky;top:1rem;font-size:.875rem}
+.ed-nav ol{margin:0;padding:0;list-style:none;counter-reset:b}
+.ed-nav li a{display:flex;gap:.5rem;align-items:center;padding:.35rem .5rem;border-radius:6px;text-decoration:none;color:var(--ink)}
+.ed-nav li a:hover{background:#fff}
+.ed-nav li a .dot{width:.55rem;height:.55rem;border-radius:50%;background:var(--ok);flex:none}
+.ed-nav li a .dot.no{background:#fff;border:2px solid var(--mut)}
+.ed-sec{padding:1.25rem;margin-bottom:1rem}
+.ed-sec h2{font-size:1.1rem;margin-bottom:.9rem}
+.ed-sec h2 small{display:block;margin-top:.2rem;color:var(--mut);font-weight:500;font-size:.8125rem}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1rem}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 1rem}
+.rte{border:1px solid var(--line2);border-radius:6px;background:#fff}
+.rte-tb{display:flex;gap:.15rem;padding:.3rem;border-bottom:1px solid var(--line);background:var(--bg)}
+.rte-tb button{border:0;background:none;min-width:2rem;height:2rem;border-radius:4px;cursor:pointer;font-weight:600}
+.rte-tb button:hover{background:#fff}
+.rte-c{padding:.75rem 1rem;min-height:12rem;max-height:22rem;overflow:auto;line-height:1.6}
+.rte-c h3{font-size:1rem;color:var(--red-t);margin:.75rem 0 .25rem}
+.rte-c p{margin:.35rem 0}
+.imgrow{display:grid;grid-template-columns:7rem minmax(0,1fr);gap:1rem;padding:.9rem 0;border-top:1px solid var(--line)}
+.imgrow:first-of-type{border-top:0}
+.imgrow .th{aspect-ratio:3/4;border-radius:6px;overflow:hidden;background:var(--bg2)}
+.imgrow .th img{width:100%;height:100%;object-fit:cover}
+.new-badge{color:var(--fed);font-weight:600;font-size:.75rem}
+.ed-aside{position:sticky;top:1rem;display:flex;flex-direction:column;gap:1rem}
+.ed-aside .box{padding:1rem}
+.ed-aside h3{font-size:.9375rem;margin-bottom:.5rem}
+.vers{list-style:none;margin:0;padding:0;font-size:.8125rem}
+.vers li{padding:.45rem 0;border-bottom:1px solid var(--line)}
+.vers li:last-child{border-bottom:0}
+.prev-tabs{display:flex;gap:.35rem;margin-bottom:.6rem}
+.prev{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;margin:0 auto;transition:width .2s}
+.prev.m{width:9.75rem} .prev.d{width:100%}
+.prev .pv-h{background:var(--red);height:.6rem}
+.prev .pv-b{padding:.5rem;font-size:.5rem;line-height:1.3}
+.prev .pv-b b{font-size:.75rem;display:block}
+.prev .pv-pair{display:grid;grid-template-columns:1fr 1fr;gap:.25rem;margin:.35rem 0}
+.prev .pv-pair img{aspect-ratio:3/4;object-fit:cover;border-radius:2px}
+.ed-foot{position:sticky;bottom:0;background:rgba(251,247,244,.97);border-top:1px solid var(--line);padding:.75rem 0;display:flex;justify-content:space-between;gap:1rem;align-items:center;z-index:5}
+.diff{padding:1rem 1.25rem;border-top:1px solid var(--line)}
+.diff h3{font-size:.9375rem;margin-bottom:.4rem}
+.del{background:var(--err-bg);color:#7A1A0C;text-decoration:line-through;padding:0 .2rem;border-radius:3px}
+.add{background:var(--ok-bg);color:#14532B;padding:0 .2rem;border-radius:3px}
+.dl{font-size:.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-right:.35rem}
+.revlist{list-style:none;margin:0;padding:0}
+.revlist li button{width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:#fff;padding:.9rem 1rem;cursor:pointer;display:flex;flex-direction:column;gap:.15rem}
+.revlist li button.on{background:var(--bg2);box-shadow:inset 3px 0 0 var(--red-t)}
+.rev{display:grid;grid-template-columns:20rem minmax(0,1fr);gap:1.25rem;align-items:start}
+.tabs{display:flex;gap:.25rem;border-bottom:1px solid var(--line);margin-bottom:1rem}
+.tabs button{border:0;background:none;padding:.6rem .9rem;cursor:pointer;font-weight:500;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--red-t);border-bottom-color:var(--red-t);font-weight:600}
+.sw{display:inline-block;width:1rem;height:1rem;border-radius:3px;vertical-align:middle}
+.steps{display:flex;gap:.5rem;margin-bottom:1rem;font-size:.8125rem;color:var(--mut)}
+.steps b{color:var(--ink)}
+.drop{border:2px dashed var(--line2);border-radius:8px;padding:1.5rem;text-align:center;background:var(--bg)}
+.lgpd{display:flex;gap:.75rem;align-items:flex-start;background:var(--ok-bg);border:1px solid #B9DBC5;border-radius:8px;padding:1rem;margin-top:1rem;max-width:52rem}
+
+/* ===== responsivo ===== */
+@media (min-width:900px){ .only-m{display:none!important} }
+@media (max-width:899px){
+  .only-d{display:none!important}
+  .capa{grid-template-columns:1fr}
+  .capa-l{padding-top:2rem}
+  .ph nav{order:3;width:100%;overflow-x:auto}
+  .logo b{max-width:8.2rem}
+  .ph{padding:.5rem .75rem}
+  .search{order:4;flex-basis:100%;max-width:none}
+  .side{top:auto;left:0;right:0;bottom:0;width:auto;max-height:56dvh;border-radius:14px 14px 0 0;border-bottom:0}
+  .side .grab{display:block;width:2.5rem;height:.3rem;border-radius:3px;background:var(--line2);margin:.5rem auto 0}
+  .filtros{left:0;right:0;top:0;bottom:0;width:auto;max-height:none;border-radius:0}
+  .legenda{bottom:.75rem;max-width:calc(100% - 1.5rem)}
+  .legenda.min ul,.legenda.min .foot,.legenda.min .nota{display:none}
+  .amostra{display:none}
+  .f-head{grid-template-columns:1fr}
+  .selo-inst{justify-self:start}
+  .cmp-pair{gap:.5rem}
+  .tl{grid-auto-flow:row;grid-auto-columns:auto;overflow:visible}
+  .tl li{border-top:0;border-left:3px solid var(--line2);padding:0 0 1.1rem 1.25rem;margin-left:.45rem}
+  .tl li::before{top:.2rem;left:-.6rem}
+  .ft{grid-template-columns:1fr}
+  .ft div{grid-template-columns:minmax(0,9rem) minmax(0,1fr)}
+  .vis{grid-template-columns:1fr}
+  .loc,.dhead,.rot{grid-template-columns:1fr}
+  #rotMap{position:static;height:18rem}
+  .ind{grid-template-columns:1fr}
+  .lista li{grid-template-columns:minmax(0,1fr) auto}
+  .lista li .c3{grid-column:1/-1}
+}
+
+/* ===== camada visual v2: materiais, movimento e tipografia ===== */
+:root{--red-s:#C8341F;--ease:cubic-bezier(.32,.72,0,1);--glass:rgba(255,255,255,.8);
+  --sh-sm:0 1px 2px rgba(43,37,35,.06),0 4px 14px rgba(43,37,35,.08);--sh-lg:0 1px 2px rgba(43,37,35,.06),0 18px 48px rgba(43,37,35,.18)}
+h1{letter-spacing:-.028em} h2{letter-spacing:-.015em}
+.btn{border-radius:10px;transition:transform .1s ease-out,background-color .15s,border-color .15s,color .15s,box-shadow .15s}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn.pri{box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 2px 8px rgba(185,46,27,.28)}
+.btn.pri:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 4px 14px rgba(185,46,27,.34)}
+.ph{background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);border-bottom-color:rgba(43,37,35,.08)}
+.logo{border-left:0;padding-left:0;position:relative;padding-left:.8rem}
+.logo::before{content:"";position:absolute;left:0;top:.1rem;bottom:.1rem;width:4px;border-radius:2px;background:var(--red)}
+.ph nav a{border-radius:999px;transition:background-color .15s,color .15s}
+.ph nav a.on{box-shadow:none;border-radius:999px;background:var(--red-bg);color:var(--red-t)}
+.search input{background:rgba(246,239,234,.85);border-color:transparent;border-radius:12px;transition:background-color .15s,box-shadow .2s}
+.search input:focus{background:#fff;outline:none;box-shadow:0 0 0 3px rgba(29,78,137,.35)}
+.sres{border-radius:14px;border-color:rgba(43,37,35,.08);box-shadow:var(--sh-lg);animation:pop .2s var(--ease);transform-origin:top center}
+.sres li button{border-radius:10px}
+.mtools .btn,.legenda,.amostra,.filtros{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);border-color:rgba(255,255,255,.7);box-shadow:var(--sh-sm)}
+.mtools .btn{border-radius:999px}
+.legenda{border-radius:16px}
+.filtros{border-radius:18px;box-shadow:var(--sh-lg);animation:pop .24s var(--ease);transform-origin:top left}
+.side{background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border-color:rgba(255,255,255,.75);border-radius:20px;box-shadow:var(--sh-lg)}
+.side .pair img,.side .pair .noimg{border-radius:10px}
+.side.enter{animation:sideIn .5s var(--ease)}
+.side.leave{animation:sideOut .26s ease-in forwards}
+@keyframes sideIn{from{transform:translateX(36px);opacity:0}}
+@keyframes sideOut{to{transform:translateX(36px);opacity:0}}
+@keyframes pop{from{opacity:0;transform:scale(.97) translateY(-4px)}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+#toast{border-radius:999px;background:rgba(43,37,35,.9);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);padding:.65rem 1.2rem;animation:toastIn .4s var(--ease)}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,14px) scale(.98)}}
+dialog{border:0;border-radius:20px;box-shadow:var(--sh-lg)}
+dialog[open]{animation:pop .28s var(--ease)}
+dialog::backdrop{background:rgba(43,37,35,.42);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+/* capa */
+.capa-l{background:var(--red-s);position:relative;overflow:hidden}
+.capa-l h1{letter-spacing:-.035em}
+.capa-foto{margin:0;flex:1 1 0;min-height:7rem;display:flex;flex-direction:column;gap:.4rem}
+@media (min-width:900px){.capa{height:100dvh;min-height:40rem}.capa-l{gap:1.1rem;padding-top:2.5rem;padding-bottom:2rem}}
+.capa-foto img{flex:1;min-height:0;width:100%;object-fit:cover;object-position:50% 35%;border-radius:16px;filter:grayscale(1) contrast(1.05);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.capa-foto figcaption{font-size:.8125rem;font-weight:500}
+.capa-l > *{animation:rise .6s var(--ease) both}
+.capa-l > *:nth-child(2){animation-delay:.05s} .capa-l > *:nth-child(3){animation-delay:.1s} .capa-l > *:nth-child(4){animation-delay:.15s} .capa-l > *:nth-child(5){animation-delay:.2s}
+.capa-r h2{font-size:1.4rem;letter-spacing:-.02em}
+.perfis{border-top:0;gap:.5rem}
+.perfis button{border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;background:#fff;transition:background-color .15s,border-color .15s,box-shadow .2s,transform .1s ease-out}
+.perfis button:hover{background:#fff;border-color:var(--line2);box-shadow:var(--sh-sm)}
+.perfis button:active{transform:scale(.985)}
+.perfis .ar{transition:transform .3s var(--ease)}
+.perfis button:hover .ar{transform:translateX(4px)}
+.perfis button.pub{border-color:rgba(185,46,27,.35);background:var(--red-bg)}
+/* ficha e páginas públicas */
+.f-head h1{letter-spacing:-.035em}
+.ph-img,.cmp-slider{border-radius:16px}
+.ph-img img{transition:transform .7s var(--ease)}
+.ph-img:hover img{transform:scale(1.025)}
+.ph-img .lab,.cmp-slider .lab{background:rgba(43,37,35,.7);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:999px;padding:.2rem .7rem}
+.bloco{border-top-color:rgba(43,37,35,.08)}
+.selo-inst{border-radius:16px}
+.ex-banner,.sugbox,.lgpd{border-radius:12px}
+.tl b{letter-spacing:-.02em}
+#miniMap,#ctxMap,#rotMap{border-radius:16px}
+.prose h3{letter-spacing:-.01em}
+/* painel */
+.box{border-radius:14px;border-color:rgba(43,37,35,.09);box-shadow:0 1px 2px rgba(43,37,35,.04)}
+.adm-side{background:#231E1C}
+.adm-side nav a{border-radius:10px;transition:background-color .15s}
+.adm-main > *{animation:rise .35s var(--ease) both}
+.field input,.field select,.field textarea{border-radius:10px;transition:border-color .15s,box-shadow .2s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--fed);box-shadow:0 0 0 3px rgba(29,78,137,.2)}
+.revlist li button{transition:background-color .15s}
+@media (max-width:899px){
+  .side{max-height:calc(100% - .5rem);border-radius:22px 22px 0 0;border-bottom:0;will-change:transform}
+  .side .grab,.side .side-h{touch-action:none;cursor:grab}
+  .ph nav a{padding:.4rem .5rem}
+  .side .grab{width:2.75rem;height:.32rem;margin:.6rem auto .1rem;background:rgba(43,37,35,.22)}
+  .capa-foto{flex:none;height:12rem}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}}
+@media (prefers-reduced-transparency:reduce){.ph,.mtools .btn,.legenda,.amostra,.filtros,.side{-webkit-backdrop-filter:none;backdrop-filter:none;background:#fff}}
+.ico.on{fill:currentColor}
+.btn.fav[aria-pressed="true"]{color:var(--red-t);border-color:rgba(185,46,27,.4);background:var(--red-bg)}
+.ph nav a{white-space:nowrap;flex:none}
+.ph nav a.conta{margin-left:auto;display:inline-flex;gap:.35rem;align-items:center}
+.ph nav a.conta .n{background:var(--red-t);color:#fff;border-radius:999px;font-size:.75rem;padding:0 .45rem}
+.salvos{list-style:none;margin:0;padding:0;max-width:48rem}
+.salvos li{display:grid;grid-template-columns:5rem minmax(0,1fr) auto;gap:1rem;align-items:center;padding:.8rem 0;border-bottom:1px solid var(--line)}
+.salvos .th{width:5rem;height:4rem;border-radius:10px;overflow:hidden;background:var(--bg2)}
+.salvos .th img{width:100%;height:100%;object-fit:cover}
+.rcards{list-style:none;margin:1.5rem 0 2rem;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(17rem,1fr));gap:1rem}
+.rcard{display:flex;flex-direction:column;gap:.75rem;height:100%;padding:1.25rem;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);text-decoration:none;transition:transform .25s cubic-bezier(.32,.72,0,1),box-shadow .25s}
+.rcard:hover{box-shadow:0 10px 28px rgba(43,37,35,.09);transform:translateY(-2px)}
+.rcard:active{transform:scale(.98)}
+.rcard h2{font-size:1.3rem;margin:0;color:var(--ink)}
+.rcard p{margin:0}
+.rc-st{list-style:none;margin:0;padding:0;display:grid;gap:.35rem;counter-reset:s;font-size:.9rem}
+.rc-st li{counter-increment:s;display:flex;gap:.5rem;align-items:center}
+.rc-st li::before{content:counter(s);width:1.4rem;height:1.4rem;border-radius:50%;background:var(--red-t);color:#fff;font-size:.72rem;font-weight:700;display:grid;place-items:center;flex:none}
+.rcard .meta{margin-top:auto;padding-top:.75rem;border-top:1px solid var(--line);color:var(--mut);font-size:.9rem}
+.rcard .go{display:inline-flex;gap:.35rem;align-items:center;font-weight:600;color:var(--red-t)}
+.roted{padding:1.25rem}
+.roted-top{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:flex-start;margin-bottom:1rem}
+.roted-top h2{font-size:1.25rem;margin:0}
+.roted .paradas textarea{width:100%;font:inherit;font-size:.95rem;padding:.5rem .65rem;border:1px solid var(--line2);border-radius:8px;resize:vertical;margin-top:.5rem}
+.addp{position:relative;margin:1rem 0 .25rem;max-width:36rem}
+.addp-in{display:flex;align-items:center;gap:.5rem;border:1px solid var(--line2);border-radius:10px;padding:0 .75rem;background:#fff;color:var(--mut)}
+.addp-in:focus-within{outline:2px solid var(--focus);outline-offset:1px}
+.addp-in input{border:0;outline:0;flex:1;min-width:0;min-height:2.75rem;font:inherit;color:var(--ink);background:transparent}
+.addp-res{position:absolute;left:0;right:0;top:calc(100% + .35rem);z-index:20;list-style:none;margin:0;padding:.35rem;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(43,37,35,.14);max-height:18rem;overflow:auto}
+.addp-res button{width:100%;text-align:left;border:0;background:none;padding:.55rem .65rem;border-radius:8px;cursor:pointer;display:grid;gap:.1rem;font:inherit;color:var(--ink)}
+.addp-res button:hover,.addp-res button:focus-visible{background:var(--bg2)}
+.addp-res li.vazio{padding:.6rem .65rem;color:var(--mut)}
+.dbusca{display:flex;align-items:center;gap:.5rem;border:1px solid var(--line2);border-radius:10px;padding:0 .75rem;background:#fff;color:var(--mut);max-width:26rem;margin-top:1.25rem}
+.dbusca:focus-within{outline:2px solid var(--focus);outline-offset:1px}
+.dbusca input{border:0;outline:0;flex:1;min-width:0;min-height:2.75rem;font:inherit;color:var(--ink);background:transparent}
+.rcard .dn{font-size:1.75rem;font-weight:700;line-height:1;color:var(--ink)}
+.dbar{display:flex;height:.5rem;border-radius:99px;overflow:hidden;background:var(--bg2)}
+.dbar i{display:block;height:100%}
+.dinst{display:flex;flex-wrap:wrap;gap:.35rem .9rem}
+@media print{ .ph,.pfoot .no-print,#toast,.no-print{display:none!important} .bloco{break-inside:avoid} }
+</style>
+</head>
+<body>
+<div id="hdr"></div>
+<div id="mapWrap" hidden><div id="map" role="region" aria-label="Mapa dos bens tombados"></div></div>
+<main id="page"></main>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+<dialog id="dlg"></dialog>
+<script>
+/* ================= utilidades ================= */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const fmt = n => n.toLocaleString('pt-BR');
+const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const store = { get(k, d) { try { const v = sessionStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+                set(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+const P = {
+  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  filter:'<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+  locate:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>', arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>', back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',
+  share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>',
+  print:'<path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+  
+  upload:'<path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/>',
+  download:'<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/>',
+  building:'<path d="M4 21V5l8-3 8 3v16"/><path d="M9 21v-4h6v4M8 8h.01M12 8h.01M16 8h.01M8 12h.01M12 12h.01M16 12h.01"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>', alert:'<circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/>',
+  tags:'<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="8" cy="8" r="1.5"/>',
+  users:'<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/>',
+  inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/>',
+  map:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',
+  history:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/>',
+  image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>', up:'<path d="m18 15-6-6-6 6"/>', down:'<path d="m6 9 6 6 6-6"/>',
+  heart:'<path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z"/>',
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'
+};
+const ic = (n, cls = '') => `<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, 4200); }
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const pick = (r, pairs) => { let x = r(), a = 0; for (const [v, w] of pairs) { a += w; if (x < a) return v; } return pairs[pairs.length - 1][0]; };
+function dist(a, b) { const R = 6371000, t = Math.PI / 180, dLa = (b[1] - a[1]) * t, dLo = (b[0] - a[0]) * t;
+  const h = Math.sin(dLa / 2) ** 2 + Math.cos(a[1] * t) * Math.cos(b[1] * t) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
+
+/* ================= dados ================= */
+const HOJE = '16/11/2026';
+const CONTA_VISITANTE = false; // conta de visitante (fora do TR) fica escondida na demo; true mostra o perfil, "Salvar" e "Minha conta"
+const ORG = { conpresp:{ sigla:'Conpresp', inst:'municipal', cls:'mun' }, condephaat:{ sigla:'Condephaat', inst:'estadual', cls:'est' }, iphan:{ sigla:'IPHAN', inst:'federal', cls:'fed' } };
+const INST = { municipal:{ rot:'Municipal', cls:'mun', cor:'#0F766E' }, estadual:{ rot:'Estadual', cls:'est', cor:'#A15C07' }, federal:{ rot:'Federal', cls:'fed', cor:'#1D4E89' } };
+const CONS = [null,
+  { rot:'Ótimo', crit:'Sem danos aparentes; manutenção em dia.' },
+  { rot:'Bom', crit:'Desgaste superficial (pintura, sujidade), sem risco à integridade.' },
+  { rot:'Regular', crit:'Danos localizados em fachada, cobertura ou esquadrias; pede manutenção.' },
+  { rot:'Ruim', crit:'Danos extensos ou infiltrações que comprometem elementos originais.' },
+  { rot:'Crítico', crit:'Risco estrutural ou de perda do bem; pede ação imediata.' }];
+const TIPS = ['Residência','Edifício comercial','Edifício institucional','Edifício religioso','Equipamento cultural','Industrial','Conjunto e espaço urbano','Outros'];
+const PERS = ['Até 1889','1889–1930','1930–1964','Depois de 1964'];
+// estilo arquitetônico (pedido na AT de 20/11/2026): os 5 dela + Colonial, Eclético e Neogótico, a validar
+const ESTS = ['Colonial','Eclético','Neogótico','Art Nouveau','Neocolonial','Art Déco','Proto-Moderno','Modernista'];
+const DIST = [ // slug, nome, lat, lng, espalhamento (graus), total de bens
+  ['se','Sé',-23.5490,-46.6342,.0055,412], ['republica','República',-23.5442,-46.6428,.0055,388],
+  ['bela-vista','Bela Vista',-23.5600,-46.6470,.006,214], ['consolacao','Consolação',-23.5505,-46.6600,.006,236],
+  ['santa-cecilia','Santa Cecília',-23.5370,-46.6510,.0055,176], ['liberdade','Liberdade',-23.5610,-46.6330,.005,132],
+  ['bom-retiro','Bom Retiro',-23.5270,-46.6385,.005,98], ['bras','Brás',-23.5420,-46.6170,.006,104],
+  ['mooca','Mooca',-23.5560,-46.5990,.008,87], ['pinheiros','Pinheiros',-23.5660,-46.6900,.008,141],
+  ['jardim-paulista','Jardim Paulista',-23.5710,-46.6630,.007,158], ['ipiranga','Ipiranga',-23.5870,-46.6090,.009,63],
+  ['lapa','Lapa',-23.5230,-46.7040,.008,72], ['outros','Demais distritos',-23.5600,-46.6400,0,219]];
+const DNOME = Object.fromEntries(DIST.map(d => [d[0], d[1]]));
+const W = 'https://commons.wikimedia.org/wiki/File:';
+const IMG = {
+  martArq:{ src:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/S%C3%A3o_Paulo_-_1939_%281%29_-_1-15787-0000-0000%2C_Acervo_do_Museu_Paulista_da_USP.jpg/960px-S%C3%A3o_Paulo_-_1939_%281%29_-_1-15787-0000-0000%2C_Acervo_do_Museu_Paulista_da_USP.jpg',
+    tipo:'arquivo', data:'1939', cred:'José Rosael / Hélio Nobre / Museu Paulista da USP (cartão-postal)', lic:'Domínio público', url:W+'S%C3%A3o_Paulo_-_1939_(1)_-_1-15787-0000-0000,_Acervo_do_Museu_Paulista_da_USP.jpg',
+    alt:'Cartão-postal de 1939 com vista do centro de São Paulo, onde se destaca o Edifício Martinelli.' },
+  martAt:{ src:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Edif%C3%ADcio_Martinelli%2C_Anhangaba%C3%BA.jpg/960px-Edif%C3%ADcio_Martinelli%2C_Anhangaba%C3%BA.jpg',
+    tipo:'atual', data:'26/08/2018', cred:'Wilson da Silva Vitorino', lic:'CC BY-SA 4.0', url:W+'Edif%C3%ADcio_Martinelli,_Anhangaba%C3%BA.jpg',
+    alt:'Fotografia de 2018 do Edifício Martinelli visto do Vale do Anhangabaú.' },
+  martAt2:{ src:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Edif%C3%ADcio_Martinelli_%284857460837%29.jpg/960px-Edif%C3%ADcio_Martinelli_%284857460837%29.jpg',
+    tipo:'atual', data:'02/08/2010', cred:'Monica Kaneko (Flickr)', lic:'CC BY-SA 2.0', url:W+'Edif%C3%ADcio_Martinelli_(4857460837).jpg',
+    alt:'Fotografia de 2010 da cobertura do Edifício Martinelli, com a balaustrada e os pináculos do terraço.' },
+  altAt:{ src:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Edif%C3%ADcio_Altino_Arantes_ao_fundo-SP.jpg/960px-Edif%C3%ADcio_Altino_Arantes_ao_fundo-SP.jpg',
+    tipo:'atual', data:'10/12/2013', cred:'Lauro Ramos Bento', lic:'CC BY-SA 4.0', url:W+'Edif%C3%ADcio_Altino_Arantes_ao_fundo-SP.jpg',
+    alt:'Fotografia de 2013 do Edifício Altino Arantes, com a torre ao fundo da rua.' }
+};
+// bens com nome: só o Martinelli tem dados conferidos; os demais são amostra (ver notas-do-prototipo.md)
+const NAMED = [
+  { slug:'edificio-martinelli', nome:'Edifício Martinelli', end:'Rua São Bento, 405', log:'rua-sao-bento', logN:'Rua São Bento', d:'se', lat:-23.5455, lng:-46.6352, org:['conpresp'], tip:'Edifício comercial', per:'1889–1930', est:'Eclético', cons:2, tomb:1992, arq:'Vilmos (William) Fillinger', ficha:'completa', rel:100 },
+  { slug:'edificio-altino-arantes', nome:'Edifício Altino Arantes', end:'Rua João Brícola, 24', d:'se', lat:-23.5459, lng:-46.6338, org:['conpresp','condephaat'], tip:'Edifício comercial', per:'1930–1964', est:'Art Déco', cons:1, tomb:null, ficha:'parcial', rel:90 },
+  { slug:'edificio-sampaio-moreira', nome:'Edifício Sampaio Moreira', end:'Rua Líbero Badaró, 340', d:'se', lat:-23.5469, lng:-46.6366, org:['conpresp','condephaat'], tip:'Edifício comercial', per:'1889–1930', est:'Eclético', cons:2, ficha:'base', rel:70 },
+  { slug:'catedral-da-se', nome:'Catedral da Sé', end:'Praça da Sé', d:'se', lat:-23.5509, lng:-46.6341, org:['conpresp','condephaat'], tip:'Edifício religioso', per:'1930–1964', est:'Neogótico', cons:2, ficha:'base', rel:95 },
+  { slug:'patio-do-colegio', nome:'Pátio do Colégio', end:'Praça Pateo do Collegio, 2', d:'se', lat:-23.5482, lng:-46.6324, org:['conpresp','condephaat','iphan'], tip:'Edifício religioso', per:'Até 1889', est:'Colonial', cons:2, ficha:'base', rel:94 },
+  { slug:'mosteiro-de-sao-bento', nome:'Mosteiro de São Bento', end:'Largo de São Bento', d:'se', lat:-23.5437, lng:-46.6345, org:['conpresp','condephaat'], tip:'Edifício religioso', per:'1889–1930', est:'Eclético', cons:1, ficha:'base', rel:92 },
+  { slug:'solar-da-marquesa-de-santos', nome:'Solar da Marquesa de Santos', end:'Rua Roberto Simonsen, 136', d:'se', lat:-23.5497, lng:-46.6315, org:['conpresp','condephaat'], tip:'Residência', per:'Até 1889', est:'Colonial', cons:3, ficha:'base', rel:85 },
+  { slug:'edificio-matarazzo', nome:'Edifício Matarazzo', end:'Viaduto do Chá, 15', d:'se', lat:-23.5465, lng:-46.6377, org:['conpresp','condephaat'], tip:'Edifício institucional', per:'1930–1964', est:'Proto-Moderno', cons:1, ficha:'base', rel:80 },
+  { slug:'theatro-municipal', nome:'Theatro Municipal', end:'Praça Ramos de Azevedo', d:'republica', lat:-23.5452, lng:-46.6388, org:['conpresp','condephaat'], tip:'Equipamento cultural', per:'1889–1930', est:'Eclético', cons:1, ficha:'base', rel:96 },
+  { slug:'edificio-italia', nome:'Edifício Itália', end:'Avenida Ipiranga, 344', d:'republica', lat:-23.5455, lng:-46.6436, org:['conpresp'], tip:'Edifício comercial', per:'1930–1964', est:'Modernista', cons:2, ficha:'base', rel:88 },
+  { slug:'edificio-prudencia', nome:'Edifício Prudência', end:'Avenida Higienópolis, 265', d:'consolacao', lat:-23.5452, lng:-46.6556, org:['conpresp'], tip:'Residência', per:'1930–1964', est:'Modernista', cons:3, arq:'Rino Levi', ficha:'parcial', rel:75 }
+];
+const BENS = (() => {
+  const r = rng(20261116), rE = rng(20261120), out = []; // rE: semente própria do estilo, para não mudar os sorteios anteriores
+  for (const b of NAMED) out.push({ ...b, named:true, id:out.length + 1 });
+  for (const [slug, , lat, lng, sp, tot] of DIST) {
+    const n = tot - NAMED.filter(b => b.d === slug).length;
+    for (let i = 0; i < n; i++) {
+      const g = () => (r() + r() + r() - 1.5) / 1.5; // aproximação de normal
+      const la = sp ? lat + g() * sp * 1.6 : -23.47 - r() * .2, lo = sp ? lng + g() * sp * 1.6 : -46.78 + r() * .32;
+      const org = []; if (r() < .88) org.push('conpresp'); if (r() < .30) org.push('condephaat'); if (r() < .05) org.push('iphan'); if (!org.length) org.push('conpresp');
+      const id = out.length + 1;
+      out.push({ id, slug:'amostra-' + id, nome:'Bem da amostra nº ' + String(id).padStart(4, '0'), d:slug, lat:la, lng:lo, org,
+        tip:pick(r, [['Residência',.30],['Edifício comercial',.22],['Edifício institucional',.14],['Edifício religioso',.09],['Equipamento cultural',.07],['Industrial',.06],['Conjunto e espaço urbano',.05],['Outros',.07]]),
+        per:pick(r, [['Até 1889',.12],['1889–1930',.38],['1930–1964',.36],['Depois de 1964',.14]]),
+        est:pick(rE, [['Colonial',.04],['Eclético',.30],['Neogótico',.04],['Art Nouveau',.05],['Neocolonial',.12],['Art Déco',.17],['Proto-Moderno',.10],['Modernista',.18]]),
+        cons:pick(r, [[1,.14],[2,.38],[3,.30],[4,.13],[5,.05]]), tomb:1985 + Math.floor(r() * 41), rel:Math.floor(r() * 60) });
+    }
+  }
+  return out;
+})();
+const BY = Object.fromEntries(BENS.map(b => [b.slug, b]));
+BY['edificio-martinelli'].tomb = 1992;
+const instDe = b => b.org.includes('iphan') ? 'federal' : b.org.includes('condephaat') ? 'estadual' : 'municipal'; // cor do ponto = instância mais alta
+const temInst = (b, i) => b.org.some(o => ORG[o].inst === i);
+const cnt = (arr, f) => arr.reduce((a, b) => a + (f(b) ? 1 : 0), 0);
+// autoverificação dos contadores: tudo precisa fechar em 2.500
+(() => {
+  const ok = BENS.length === 2500 && DIST.reduce((a, d) => a + cnt(BENS, b => b.d === d[0]), 0) === 2500
+    && TIPS.reduce((a, t) => a + cnt(BENS, b => b.tip === t), 0) === 2500 && ESTS.reduce((a, t) => a + cnt(BENS, b => b.est === t), 0) === 2500 && [1,2,3,4,5].reduce((a, k) => a + cnt(BENS, b => b.cons === k), 0) === 2500
+    && DIST.every(d => cnt(BENS, b => b.d === d[0]) === d[5]) && Object.keys(INST).reduce((a, i) => a + cnt(BENS, b => temInst(b, i)), 0) >= 2500;
+  console.assert(ok, 'Contadores não fecham em 2.500'); if (ok) console.info('Contadores conferidos: 2.500 bens; somas por distrito, tipologia, estilo, conservação e instância fecham.');
+})();
+
+/* conteúdo curatorial (texto de exemplo) */
+const MART = {
+  texto:`<h3>Contexto histórico</h3>
+<p>Foi o segundo arranha-céu do Brasil entre 1934 e 1947 (e, durante um tempo, o mais alto da América Latina), idealizado pelo italiano Giuseppe Martinelli e projetado pelo arquiteto húngaro Vilmos (William) Fillinger (1888-1968), formado na Academia de Belas-Artes de Viena.</p>
+<p>A obra começou em 1924. O prédio foi inaugurado ainda inacabado, em 1929, e concluído em 1934, com 30 andares e 105 metros de altura. Em São Paulo, só foi superado em 1947, pelo Edifício Altino Arantes.</p>
+<h3>Análise arquitetônica</h3>
+<p>De linguagem eclética, o edifício ocupa o triângulo formado pela Rua São Bento, pela Avenida São João e pela Rua Líbero Badaró. A estrutura combina concreto e alvenaria de tijolos, e o volume se escalona até o topo, onde Martinelli instalou a própria residência.</p>
+<h3>Valores de preservação</h3>
+<p>O Martinelli marca o início da verticalização do centro de São Paulo e a passagem da cidade de capital do café a metrópole. Desapropriado pela Prefeitura em 1975 e reformado até 1979, foi tombado pelo Conpresp em 1992, no conjunto do Vale do Anhangabaú, com nível de proteção 2.</p>`,
+  tl:[[1924,'Início da obra'],[1929,'Inauguração, ainda inacabado'],[1934,'Conclusão: 30 andares e 105 m'],[1947,'Superado em altura pelo Edifício Altino Arantes'],[1975,'Desapropriação pela Prefeitura e início da reforma'],[1979,'Reinauguração após a reforma'],[1992,'Tombamento pelo Conpresp (Resolução 37/92)',1],[2008,'Início da reforma da cobertura']],
+  ft:[['Denominação oficial','Edifício Martinelli'],['Endereço completo','Rua São Bento, 405 (com frentes para a Av. São João e a Rua Líbero Badaró), Centro'],['Distrito','Sé'],['Ano de construção','1924 a 1934'],['Autor ou projetista','Vilmos (William) Fillinger'],['Tipologia','Edifício comercial (arranha-céu)'],['Estilo arquitetônico','Eclético'],['Instância e órgão','Municipal: Conpresp'],['Resolução','Conpresp nº 37/92 (Vale do Anhangabaú)'],['Processo','16-042.110-91*60'],['Grau de preservação','Nível de proteção 2 (NP-2)'],['Área envoltória','Perímetro do Vale do Anhangabaú (Resolução Conpresp nº 06/91)']],
+  vis:[['Aberto ao público','Térreo com lojas'],['Condições de visita','Visita ao terraço: consultar regras atuais'],['Agendamento',null]], // acessibilidade física fica na base técnica (AT 20/11/2026)
+  refs:['Conpresp. Resolução nº 37/92: tombamento do Vale do Anhangabaú e vizinhanças (Anexo I, item 118). Processo 16-042.110-91*60.','Prefeitura de São Paulo. Geosampa: camada "Bem Tombado e/ou em Processo de Tombamento".','"Edifício Martinelli". Wikipédia, a enciclopédia livre (consulta em 12/11/2026). Fonte provisória, a substituir pela bibliografia da curadoria.'],
+};
+const ROTEIROS_PADRAO = [{ slug:'arranha-ceus-do-centro', nome:'Arranha-céus do Centro',
+  resumo:'Do Martinelli ao Edifício Itália, os primeiros prédios altos de São Paulo.',
+  apres:'Um passeio a pé pelos primeiros prédios altos de São Paulo, do Martinelli, que abriu a corrida para o alto nos anos 1920, até o Edifício Itália, já na cidade dos anos 1960. O percurso atravessa o Vale do Anhangabaú pelo Viaduto do Chá.',
+  paradas:[['edificio-martinelli','O ponto de partida: o primeiro arranha-céu da cidade e o fio desta visita.'],['edificio-altino-arantes','A duas quadras, o prédio que tirou do Martinelli o posto de mais alto de São Paulo, em 1947.'],['edificio-sampaio-moreira','Anterior ao Martinelli, é um dos precursores da verticalização na Rua Líbero Badaró.'],['edificio-italia','Do outro lado do Viaduto do Chá, o arranha-céu que encerra o percurso.']]
+ }, { slug:'onde-a-cidade-nasceu', nome:'Onde a cidade nasceu',
+  resumo:'Do Mosteiro de São Bento à Catedral da Sé, pelo núcleo mais antigo de São Paulo.',
+  apres:'Um passeio curto pelo núcleo mais antigo de São Paulo, entre o Largo de São Bento e a Praça da Sé. O percurso passa pelo lugar onde os jesuítas fundaram a vila e por um dos poucos casarões que restam da cidade colonial.',
+  paradas:[['mosteiro-de-sao-bento','Os beneditinos estão neste largo desde o fim do século XVI. A igreja atual é do começo do século XX.'],['patio-do-colegio','O lugar onde os jesuítas fundaram São Paulo, em 1554. O conjunto que se vê hoje é uma reconstrução.'],['solar-da-marquesa-de-santos','Casarão do século XVIII, um dos poucos que restam da cidade colonial. Leva o nome de Domitila de Castro, que morou ali.'],['catedral-da-se','A catedral neogótica fecha o percurso. Na praça em frente fica o marco zero da cidade.']]
+}, { slug:'em-volta-do-anhangabau', nome:'Em volta do Anhangabaú',
+  resumo:'Do Theatro Municipal ao Martinelli, dos dois lados do Viaduto do Chá.',
+  apres:'Um percurso pelos dois lados do Vale do Anhangabaú, ligados pelo Viaduto do Chá. Começa no Theatro Municipal e termina no Martinelli, passando pela sede da Prefeitura.',
+  paradas:[['theatro-municipal','Inaugurado em 1911 e palco da Semana de Arte Moderna de 1922.'],['edificio-matarazzo','Antiga sede das Indústrias Matarazzo, projetada por Marcello Piacentini. Hoje abriga a Prefeitura.'],['edificio-sampaio-moreira','Na Rua Líbero Badaró, um dos precursores da verticalização, anterior ao Martinelli.'],['edificio-martinelli','O fim do passeio: o primeiro arranha-céu da cidade e o fio desta visita.']]
+}];
+// roteiros editáveis no painel (Taxonomia e filtros); a demo guarda as mudanças na sessão
+const ROTEIROS = store.get('ep-rots', null) || ROTEIROS_PADRAO.map(r => ({ ...r, st:'publicado' }));
+const saveRots = () => store.set('ep-rots', ROTEIROS);
+const EQUIPE = [['Raquel Nery','Administradora','16/11/2026, 14h12'],['Marina Okabe','Curadora','13/11/2026, 18h40'],['Thiago Brandão','Curador','12/11/2026, 10h05'],['Lúcia Ferraz','Curadora','11/11/2026, 16h22']];
+
+/* ================= estado ================= */
+const S = {
+  role:store.get('ep-role', null), lang:'pt',
+  f:{ inst:['municipal','estadual','federal'], tip:'', per:'', est:'', d:'', near:false },
+  sel:null, filtrosAbertos:false, legMin:innerWidth < 900,
+  mart:store.get('ep-mart', { ver:7, status:'publicado', novaImg:false, imgLic:'', texto:null, vistoria:'14/08/2026', fotos:['martAt'] }),
+  fila:store.get('ep-fila', ['edificio-sampaio-moreira','theatro-municipal']),
+  novos:store.get('ep-novos', []), // bens cadastrados em "Novo bem" durante a demo
+  distPag:1, distOrd:'rel'
+};
+const saveMart = () => { store.set('ep-mart', S.mart); store.set('ep-fila', S.fila); };
+
+/* ================= mapa principal ================= */
+let map = null, mapOk = false, nearMarker = null;
+const NEAR = { lng:-46.6339, lat:-23.5503, raio:500, nome:'Praça da Sé' };
+function filtrados() {
+  const f = S.f;
+  return BENS.filter(b => f.inst.some(i => temInst(b, i)) && (!f.tip || b.tip === f.tip) && (!f.per || b.per === f.per)
+    && (!f.est || b.est === f.est) && (!f.d || b.d === f.d) && (!f.near || dist([NEAR.lng, NEAR.lat], [b.lng, b.lat]) <= NEAR.raio));
+}
+const fc = arr => ({ type:'FeatureCollection', features:arr.map(b => ({ type:'Feature', geometry:{ type:'Point', coordinates:[b.lng, b.lat] },
+  properties:{ slug:b.slug, nome:b.nome, inst:instDe(b), named:!!b.named } })) });
+function initMap() {
+  if (map) { setTimeout(() => map.resize(), 0); return; }
+  if (!window.maplibregl) { $('#map').innerHTML = '<div class="map-fallback"><div><b>Mapa indisponível sem internet.</b><br>O protótipo usa o MapLibre e tiles abertos (OpenFreeMap), carregados da rede.</div></div>'; return; }
+  map = new maplibregl.Map({ container:'map', style:'https://tiles.openfreemap.org/styles/positron', center:[-46.645, -23.553], zoom:innerWidth < 900 ? 11.3 : 12, attributionControl:{ compact:true } });
+  map.addControl(new maplibregl.NavigationControl({ showCompass:false }), 'top-right');
+  map.on('load', () => {
+    map.addSource('bens', { type:'geojson', data:fc(filtrados()), cluster:true, clusterRadius:46, clusterMaxZoom:15 });
+    map.addLayer({ id:'cl', type:'circle', source:'bens', filter:['has','point_count'], paint:{ 'circle-color':'#B92E1B', 'circle-radius':['step',['get','point_count'],15,40,19,150,24,500,30], 'circle-stroke-color':'#E8402A', 'circle-stroke-width':4, 'circle-stroke-opacity':.35 } });
+    map.addLayer({ id:'cl-n', type:'symbol', source:'bens', filter:['has','point_count'], layout:{ 'text-field':['number-format',['get','point_count'],{ locale:'pt-BR' }], 'text-font':['Noto Sans Bold'], 'text-size':13, 'text-allow-overlap':true }, paint:{ 'text-color':'#fff' } });
+    map.addLayer({ id:'pt', type:'circle', source:'bens', filter:['!',['has','point_count']], paint:{ 'circle-color':['match',['get','inst'],'federal','#1D4E89','estadual','#A15C07','#0F766E'], 'circle-radius':['interpolate',['linear'],['zoom'],12,['case',['get','named'],6,3.5],17,['case',['get','named'],11,7]], 'circle-stroke-color':'#fff', 'circle-stroke-width':1.5 } });
+    map.addLayer({ id:'pt-lab', type:'symbol', source:'bens', minzoom:15, filter:['all',['!',['has','point_count']],['get','named']], layout:{ 'text-field':['get','nome'], 'text-font':['Noto Sans Bold'], 'text-size':12, 'text-offset':[0,1.3], 'text-anchor':'top' }, paint:{ 'text-color':'#2B2523', 'text-halo-color':'#fff', 'text-halo-width':2 } });
+    map.addLayer({ id:'pt-sel', type:'circle', source:'bens', filter:['==',['get','slug'],''], paint:{ 'circle-radius':14, 'circle-color':'rgba(0,0,0,0)', 'circle-stroke-color':'#B92E1B', 'circle-stroke-width':3 } });
+    map.on('click', 'cl', e => { const f = e.features[0]; map.getSource('bens').getClusterExpansionZoom(f.properties.cluster_id).then(z => map.easeTo({ center:f.geometry.coordinates, zoom:z + .3 })); });
+    map.on('click', 'pt', e => abrirLateral(e.features[0].properties.slug));
+    for (const l of ['cl','pt']) { map.on('mouseenter', l, () => map.getCanvas().style.cursor = 'pointer'); map.on('mouseleave', l, () => map.getCanvas().style.cursor = ''); }
+    mapOk = true; atualizaMapa(); if (S.sel) marcaSel(S.sel);
+  });
+}
+function atualizaMapa() { if (mapOk) map.getSource('bens').setData(fc(filtrados())); renderMapUI(); }
+function marcaSel(slug) { if (mapOk) map.setFilter('pt-sel', ['==',['get','slug'], slug || '']); }
+function irPara(slug) { const b = BY[slug]; if (!b) return; if (location.hash.replace(/\?.*/, '') !== '#/') location.hash = '#/';
+  setTimeout(() => { if (map) map.flyTo({ center:[b.lng, b.lat], zoom:17, offset:innerWidth >= 900 ? [-200, 0] : [0, -Math.round(innerHeight * .26)], duration:1400 }); abrirLateral(slug); }, 60); }
+function abrirLateral(slug) { S.selAnim = !S.sel; if (!S.sel) S.sheet = 'peek'; S.sel = slug; marcaSel(slug); renderMapUI(); }
+function filtrosNaURL() { // filtros persistentes na URL (TR 6.3)
+  const f = S.f, q = new URLSearchParams();
+  if (f.inst.length < 3) q.set('instancia', f.inst.join(',')); for (const k of ['tip','per','est','d']) if (f[k]) q.set({ tip:'tipologia', per:'periodo', est:'estilo', d:'distrito' }[k], f[k]);
+  if (f.near) q.set('perto', '500m'); const s = q.toString(); history.replaceState(null, '', '#/' + (s ? '?' + s : ''));
+}
+function filtrosDaURL() { const m = location.hash.match(/\?(.*)$/); if (!m) return; const q = new URLSearchParams(m[1]);
+  if (q.get('instancia')) S.f.inst = q.get('instancia').split(','); S.f.tip = q.get('tipologia') || ''; S.f.per = q.get('periodo') || ''; S.f.est = q.get('estilo') || ''; S.f.d = q.get('distrito') || ''; S.f.near = !!q.get('perto'); }
+function perto() {
+  S.f.near = !S.f.near; filtrosNaURL(); atualizaMapa();
+  if (!mapOk) return;
+  if (S.f.near) { if (!nearMarker) { const el = document.createElement('div'); el.style.cssText = 'width:18px;height:18px;border-radius:50%;background:#1D4E89;border:3px solid #fff;box-shadow:0 0 0 6px rgba(29,78,137,.25)'; nearMarker = new maplibregl.Marker({ element:el }).setLngLat([NEAR.lng, NEAR.lat]); }
+    nearMarker.addTo(map); map.flyTo({ center:[NEAR.lng, NEAR.lat], zoom:15.3 }); toast('Localização simulada no protótipo: ' + NEAR.nome + ', raio de 500 m.'); }
+  else if (nearMarker) nearMarker.remove();
+}
+</script>
+<script>
+/* ================= peças compartilhadas ================= */
+MART.resumo = 'Foi o segundo arranha-céu do Brasil entre 1934 e 1947 (e, durante um tempo, o mais alto da América Latina), idealizado pelo italiano Giuseppe Martinelli e projetado pelo húngaro Vilmos (William) Fillinger.';
+const T = {
+  pt:{ b:['Identificação','Na época e hoje','Texto curatorial','Linha do tempo','Ficha técnica','Visitação','Localização e entorno','Referências e créditos','Compartilhar'], ant:'Na época', hoje:'Hoje', ni:'não informado', aviso:'' },
+  en:{ b:['Identification','Then and now','Curatorial text','Timeline','Technical data','Visiting','Location and surroundings','References and credits','Share'], ant:'Then', hoje:'Now', ni:'not provided', aviso:'Preview of the English version: the page structure is translated; the curatorial team will translate the texts, so this sample keeps them in Portuguese.' },
+  es:{ b:['Identificación','Antes y ahora','Texto curatorial','Línea de tiempo','Ficha técnica','Visitas','Ubicación y entorno','Referencias y créditos','Compartir'], ant:'Antes', hoje:'Hoy', ni:'no informado', aviso:'Vista previa de la versión en español: la estructura de la página está traducida; el equipo de curaduría traducirá los textos, por eso esta muestra los mantiene en portugués.' }
+};
+// patrocínio (AT de 20/11/2026): bloco independente, editado só pela administração; selo neutro, nunca marca real
+const PAT_PADRAO = { exibir:true, nome:'Patrocinador do projeto', marca:'marca do patrocinador', link:'https://www.example.org' };
+S.pat = store.get('ep-pat', PAT_PADRAO);
+const linkOk = u => { try { const x = new URL(u); return x.protocol === 'https:' && x.hostname.includes('.'); } catch (e) { return false; } };
+function patHTML(v, P = S.pat) {
+  const e = x => String(x || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const selo = `<span class="selo-pat">Patrocínio<span>${e(P.marca)}</span></span>`;
+  if (v !== 'sobre') return P.exibir ? selo : '';
+  if (!P.exibir) return '<p class="mut" style="max-width:40rem">Espaço de patrocínio disponível.</p>';
+  return `<div class="pat-blk">${selo}<div><p><b>${e(P.nome)}</b></p><p class="small mut">Espaço reservado à marca do patrocinador.</p>${linkOk(P.link) ? `<p class="small"><a href="${e(P.link)}" target="_blank" rel="noopener">${e(new URL(P.link).hostname)}</a></p>` : ''}</div></div>`;
+}
+// módulos da proposta (AT de 20/11/2026)
+const MODN = { 1:'Núcleo: mapa, ficha e curadoria', 2:'Navegação por território', 3:'Roteiros e idiomas' };
+const modTag = n => `<span class="tag mod" title="Módulo ${n}: ${MODN[n]}">Módulo ${n}</span>`;
+const modMn = n => `<span class="mn" title="Módulo ${n}: ${MODN[n]}">M${n}</span>`;
+const fotosDe = b => b.slug === 'edificio-martinelli' ? { arq:[IMG.martArq], at:S.mart.fotos.map(k => IMG[k]) } : b.slug === 'edificio-altino-arantes' ? { arq:[], at:[IMG.altAt] } : { arq:[], at:[] };
+const instTags = b => b.org.map(o => `<span class="inst ${ORG[o].cls}"><i></i>${INST[ORG[o].inst].rot} · ${ORG[o].sigla}</span>`).join(' ');
+const favBtn = slug => { if (!CONTA_VISITANTE) return ''; const on = S.salvos.includes(slug); return `<button class="btn sm fav" data-act="favoritar" data-slug="${slug}" aria-pressed="${on}">${ic('heart', on ? 'on' : '')} ${on ? 'Salvo' : 'Salvar'}</button>`; };
+const ftMart = () => MART.ft.map(r => r[0] === 'Estilo arquitetônico' ? [r[0], BY['edificio-martinelli'].est] : r);
+const consHTML = k => `<span class="cons k${k}"><b>${k}</b>${CONS[k].rot}</span>`;
+const imgTag = (im, cls = '') => `<img class="${cls}" src="${im.src}" alt="${im.alt}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'noimg',textContent:'A imagem não carregou (sem internet).'}))">`;
+const fig = (im, lab) => im ? `<figure>${imgTag(im)}<figcaption>${lab} · ${im.data}</figcaption></figure>` : `<figure><div class="noimg">${lab}: imagem não disponível</div><figcaption>&nbsp;</figcaption></figure>`;
+let minis = [];
+function miniMap(id, opts) {
+  if (!window.maplibregl || !$('#' + id)) return null;
+  const m = new maplibregl.Map({ container:id, style:'https://tiles.openfreemap.org/styles/positron', center:opts.center, zoom:opts.zoom || 15, attributionControl:{ compact:true }, cooperativeGestures:true });
+  m.addControl(new maplibregl.NavigationControl({ showCompass:false }), 'top-right');
+  m.on('load', () => opts.load && opts.load(m)); minis.push(m); return m;
+}
+function circulo(c, r, n = 48) { const pts = []; for (let i = 0; i <= n; i++) { const a = i / n * 2 * Math.PI; pts.push([c[0] + r / (111320 * Math.cos(c[1] * Math.PI / 180)) * Math.cos(a), c[1] + r / 110540 * Math.sin(a)]); } return { type:'Feature', geometry:{ type:'Polygon', coordinates:[pts] } }; }
+function pontos(m, arr, raio = 5) {
+  m.addSource('p', { type:'geojson', data:fc(arr) });
+  m.addLayer({ id:'p', type:'circle', source:'p', paint:{ 'circle-color':['match',['get','inst'],'federal','#1D4E89','estadual','#A15C07','#0F766E'], 'circle-radius':['case',['get','named'],raio + 2,raio], 'circle-stroke-color':'#fff', 'circle-stroke-width':1.5 } });
+}
+
+/* ================= cabeçalho público e busca ================= */
+function hdr(on) {
+  const nav = [['#/','Mapa','mapa',1],['#/distritos/','Distritos','distrito',2],['#/roteiros/','Roteiros','roteiro',3],['#/sobre/','Sobre','sobre',1]], membro = S.role === 'membro';
+  return `<header class="ph">
+  <a class="logo" href="#/"><b>Encontro com o Patrimônio</b><small class="only-d">Movimento São Paulo Restauro e Memória</small></a>
+  <div class="search" role="search">${ic('search')}<input id="q" type="search" autocomplete="off" placeholder="Buscar endereço, bem ou arquiteto" aria-label="Buscar endereço, bem ou arquiteto" aria-controls="sres" aria-expanded="false"><ul class="sres" id="sres" role="listbox" hidden></ul></div>
+  <nav aria-label="Navegação principal">${nav.map(([h, t, k, n]) => `<a href="${h}" class="${on === k ? 'on' : ''}" ${on === k ? 'aria-current="page"' : ''}>${t}${modMn(n)}</a>`).join('')}${!CONTA_VISITANTE ? '' : membro ? `<a href="#/minha-conta/" class="conta ${on === 'conta' ? 'on' : ''}" aria-label="Bens salvos: ${S.salvos.length}">${ic('heart')} <span class="only-d">Salvos</span> <span class="n">${S.salvos.length}</span></a>` : `<a href="#" class="conta" data-act="entrar">Entrar</a>`}</nav>
+  <div class="acts">
+    <span class="perfil-pill"><span class="only-d">Perfil: <b>${membro ? 'Camila (com conta)' : 'Visitante'}</b></span><button data-act="perfil">Trocar perfil</button></span>
+  </div></header>`;
+}
+const IDX = [
+  ...NAMED.map(b => ({ g:'Bens', t:b.nome, s:`${b.end} · ${DNOME[b.d]}`, k:norm(b.nome + ' ' + b.end), go:() => irPara(b.slug) })),
+  { g:'Arquitetos', t:'Vilmos (William) Fillinger', s:'Arquiteto do Edifício Martinelli', k:'vilmos william fillinger', go:() => irPara('edificio-martinelli') },
+  { g:'Arquitetos', t:'Rino Levi', s:'Arquiteto do Edifício Prudência (amostra)', k:'rino levi', go:() => irPara('edificio-prudencia') },
+  { g:'Logradouros', t:'Rua São Bento', s:'Distrito Sé', k:'rua sao bento', go:() => location.hash = '#/logradouro/rua-sao-bento/' },
+  ...DIST.filter(d => d[0] !== 'outros').map(d => ({ g:'Distritos', t:'Distrito ' + d[1], s:fmt(d[5]) + ' bens tombados', k:norm('distrito ' + d[1]), go:() => location.hash = '#/distrito/' + d[0] + '/' }))
+];
+let sAtivos = [], sPos = -1;
+function busca(v) {
+  const ul = $('#sres'), q = norm(v.trim()); if (!ul) return;
+  sAtivos = q.length < 2 ? [] : IDX.filter(i => q.split(/\s+/).every(p => i.k.includes(p))).slice(0, 8); sPos = -1;
+  if (!sAtivos.length) { ul.hidden = q.length < 2; ul.innerHTML = q.length < 2 ? '' : '<li class="grp">Nada encontrado. Tente o nome do prédio, a rua ou o arquiteto.</li>'; $('#q').setAttribute('aria-expanded', !ul.hidden); return; }
+  let g = ''; ul.innerHTML = sAtivos.map((i, n) => (i.g !== g ? `<li class="grp" role="presentation">${g = i.g}</li>` : '') + `<li role="option"><button data-res="${n}"><span>${i.t}</span><small>${i.s}</small></button></li>`).join('');
+  ul.hidden = false; $('#q').setAttribute('aria-expanded', 'true');
+}
+function escolhe(n) { const i = sAtivos[n]; if (!i) return; $('#sres').hidden = true; $('#q').value = ''; i.go(); }
+
+/* ================= tela 1: capa e escolha de perfil ================= */
+function pgCapa() {
+  const perfis = [['visitante','Visitante','Mapa, fichas, distritos e roteiros, sem cadastro. É o site aberto ao público, no celular e no computador.','pub'],
+    ['membro','Visitante com conta','O mesmo site, com login opcional para salvar bens numa lista própria. <span class="tag sug">sugestão, fora do TR</span>'],
+    ['curador','Curador(a)','Edita as fichas, envia para revisão e publica o que outra pessoa da curadoria enviou.'],
+    ['admin','Administrador(a)','Tudo o que a curadoria faz, mais taxonomia, filtros e roteiros, e a gestão da equipe e dos acessos.']].filter(p => CONTA_VISITANTE || p[0] !== 'membro');
+  return `<div class="capa">
+  <section class="capa-l">
+    <span class="org">Movimento São Paulo Restauro e Memória</span>
+    <h1>Encontro com o Patrimônio</h1>
+    <p class="lead">Cada bem tombado da cidade num único mapa, com uma ficha curatorial que qualquer pessoa entende.</p>
+    <figure class="capa-foto">${imgTag(IMG.martArq)}<figcaption>Edifício Martinelli em 1939. Cartão-postal, Museu Paulista da USP, domínio público.</figcaption></figure>
+    <div class="meta"><span class="num"><b>2.500</b>bens tombados em São Paulo<br>Conpresp, Condephaat e IPHAN</span>${patHTML()}</div>
+  </section>
+  <section class="capa-r">
+    <h2>Escolha um perfil para navegar</h2>
+    <ul class="perfis">${perfis.map(([k, t, d, c]) => `<li><button data-role="${k}" class="${c || ''}"><b>${t}</b><span class="d">${d}</span><span class="ar">${ic('arrow')}</span></button></li>`).join('')}</ul>
+    <p style="margin:0"><a href="#/modulos" style="font-weight:600;color:var(--red-t)">Como o projeto se divide em módulos ${ic('arrow')}</a></p>
+    <p class="nota">Protótipo navegável feito pelo NTec da Poli Júnior, revisto depois da AT de 20/11/2026. Cada perfil vê só as próprias telas; o botão "Trocar perfil" fica sempre visível. Só o Edifício Martinelli tem dados conferidos; os demais bens e pontos do mapa são amostra. <button class="btn sm" data-act="reset" style="margin-top:.5rem">Reiniciar a demonstração</button></p>
+  </section></div>`;
+}
+
+/* ================= tela 2: mapa ================= */
+function filtrosHTML() {
+  const f = S.f, sel = (id, lab, k, opts) => `<div class="field"><label for="${id}">${lab}</label><select id="${id}" data-f="${k}"><option value="">Todos</option>${opts.map(([v, t]) => `<option value="${v}" ${String(f[k]) === String(v) ? 'selected' : ''}>${t}</option>`).join('')}</select></div>`;
+  return `<div class="filtros" id="filtros" role="dialog" aria-label="Filtros do mapa">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem"><b>Filtros</b><button class="btn sm ghost" data-act="filtros" aria-label="Fechar filtros">${ic('x')}</button></div>
+  <fieldset><legend>Instância e órgão de tombamento</legend>${Object.entries(INST).map(([k, v]) => `<label class="chk"><input type="checkbox" id="fi-${k}" data-inst="${k}" ${f.inst.includes(k) ? 'checked' : ''}><span class="inst ${v.cls}"><i></i>${v.rot} (${{ municipal:'Conpresp', estadual:'Condephaat', federal:'IPHAN' }[k]})</span></label>`).join('')}</fieldset>
+  ${sel('fTip', 'Tipologia', 'tip', TIPS.filter(t => !S.tipOff.includes(t)).map(t => [t, t]))}${sel('fPer', 'Período de construção', 'per', PERS.map(t => [t, t]))}
+  ${sel('fEst', 'Estilo arquitetônico', 'est', ESTS.map(t => [t, t]))}${sel('fD', 'Distrito', 'd', DIST.filter(d => d[0] !== 'outros').map(d => [d[0], d[1]]))}
+  <div style="display:flex;gap:.5rem;justify-content:space-between"><button class="btn" data-act="limpar">Limpar</button><button class="btn pri" data-act="filtros">Ver ${fmt(filtrados().length)} bens</button></div>
+  <p class="small mut">Os filtros ficam no endereço da página: dá para compartilhar o recorte por link.</p></div>`;
+}
+function sideHTML(b) {
+  if (!b) return '';
+  const full = b.slug === 'edificio-martinelli', fo = fotosDe(b);
+  return `<aside class="side" aria-label="Detalhe do bem">
+  <div class="grab" aria-hidden="true"></div>
+  <div class="side-h"><div><span class="eyebrow">${b.d === 'outros' ? 'Outros distritos' : 'Distrito ' + DNOME[b.d]}</span><h2>${b.nome}</h2>${b.end ? `<p class="mut" style="margin:.2rem 0 0">${b.end}</p>` : ''}</div><button class="btn sm ghost" data-act="fecharSide" aria-label="Fechar detalhe">${ic('x')}</button></div>
+  <div class="side-b">
+    <div class="row">${instTags(b)}</div>
+    ${b.named ? `<div class="pair">${fig(fo.arq[0], 'Na época')}${fig(fo.at[0], 'Hoje')}</div>` : ''}
+    ${full ? `<p><span class="tag ex">texto de exemplo</span></p><p>${MART.resumo}</p>` : b.named ? `<p class="small mut">${b.ficha === 'parcial' ? 'Ficha parcial: alguns blocos ainda sem conteúdo.' : 'Ficha só com os dados da base; texto curatorial em produção.'} Bem da amostra, com dados a conferir.</p>` : `<p class="small mut">Ponto de amostra: posição e atributos ilustrativos. No sistema, cada ponto vem do cadastro feito pela equipe.</p>`}
+    <dl class="vis" style="margin:.5rem 0"><div><dt>Tipologia</dt><dd>${b.tip}</dd></div><div><dt>Período</dt><dd>${b.per}</dd></div>${b.est ? `<div><dt>Estilo</dt><dd>${b.est}</dd></div>` : ''}</dl>
+    <div class="row">${b.named ? `<a class="btn pri" href="#/bem/${b.slug}/">Abrir ficha completa ${ic('arrow')}</a>${favBtn(b.slug)}<button class="btn" data-act="copiar" data-slug="${b.slug}">${ic('link')} Copiar link</button>` : ''}</div>
+  </div></aside>`;
+}
+function renderMapUI() {
+  const ui = $('#mapUI'); if (!ui) return;
+  const arr = filtrados(), f = S.f, ae = document.activeElement && document.activeElement.id;
+  const nf = (f.inst.length < 3 ? 1 : 0) + !!f.tip + !!f.per + !!f.est + !!f.d + f.near;
+  ui.innerHTML = `<div class="mtools">
+    <button class="btn" id="bFil" data-act="filtros" aria-expanded="${S.filtrosAbertos}">${ic('filter')} Filtros ${nf ? `<span class="n">${nf}</span>` : ''}</button>
+    <button class="btn" id="bPerto" data-act="perto" aria-pressed="${f.near}">${ic('locate')} Perto de mim</button></div>
+  ${S.filtrosAbertos ? filtrosHTML() : ''}
+  <section class="legenda ${S.legMin ? 'min' : ''}" aria-label="Contadores do acervo e legenda" ${S.sel && innerWidth < 900 ? 'hidden' : ''}>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem"><div><span class="tot">${fmt(arr.length)}</span> ${arr.length === BENS.length ? 'bens tombados na cidade' : 'bens no recorte, de 2.500'}</div>
+    <button class="btn sm ghost only-m" id="bLeg" data-act="leg" aria-expanded="${!S.legMin}">${S.legMin ? 'Legenda' : 'Ocultar'}</button></div>
+    <ul>${Object.entries(INST).map(([k, v]) => `<li><span class="inst ${v.cls}"><i></i>${v.rot}</span><b>${fmt(cnt(arr, b => temInst(b, k)))}</b></li>`).join('')}</ul>
+    <p class="nota small mut" style="margin:0">Um bem pode ter mais de uma proteção, por isso a soma das instâncias passa do total. A cor do ponto é a da instância mais alta.</p>
+    <div class="foot"><span class="small mut">Fontes: Conpresp, Condephaat e IPHAN</span>${patHTML()}</div>
+  </section>
+  <p class="amostra">Módulo 1 · Amostra: só o Martinelli tem dados conferidos. Os outros pontos têm posição e atributos ilustrativos.</p>
+  ${S.sel ? sideHTML(BY[S.sel]) : ''}`;
+  if (ae && $('#' + ae)) $('#' + ae).focus();
+  if (S.sel) armaSheet();
+}
+const rubber = (o, dim, c = .55) => (o * dim * c) / (dim + c * o); // resistência progressiva na borda
+const projeta = v => (v / 1000) * .998 / (1 - .998); // projeção de momento (desaceleração ~ rolagem)
+// shortcut: bottom sheet com transição CSS de curva tipo mola, sem biblioteca; no Next.js usar o Drawer (vaul) do shadcn
+function armaSheet() {
+  const el = $('.side'); if (!el) return;
+  if (innerWidth >= 900) { if (S.selAnim) el.classList.add('enter'); S.selAnim = false; return; }
+  const H = () => el.offsetHeight, peek = () => Math.max(0, H() - Math.round(innerHeight * .46));
+  const pos = () => new DOMMatrix(getComputedStyle(el).transform).m42; // parte do valor na tela: dá para agarrar no meio do movimento
+  const vai = (y, seco) => { el.style.transition = seco ? 'none' : 'transform .5s cubic-bezier(.32,.72,0,1)'; el.style.transform = `translateY(${y}px)`; };
+  const alvo = S.sheet === 'full' ? 0 : peek();
+  if (S.selAnim) { vai(H(), true); el.getBoundingClientRect(); vai(alvo); S.selAnim = false; } else vai(alvo, true);
+  let y0 = 0, b0 = 0, hist = [], ativo = false;
+  const zona = [el.querySelector('.grab'), el.querySelector('.side-h')].filter(Boolean);
+  const solta = () => { if (!ativo) return; ativo = false;
+    const a = hist[0], b = hist[hist.length - 1], dt = b[1] - a[1], v = dt > 0 ? (b[0] - a[0]) / dt * 1000 : 0;
+    if (Math.abs(b[0] - y0) < 6) { S.sheet = S.sheet === 'full' ? 'peek' : 'full'; return vai(S.sheet === 'full' ? 0 : peek()); }
+    const proj = pos() + projeta(v), pts = [[0, 'full'], [peek(), 'peek'], [H(), 'fechar']];
+    const [y, k] = pts.reduce((m, p) => Math.abs(p[0] - proj) < Math.abs(m[0] - proj) ? p : m);
+    if (k === 'fechar') { vai(H()); setTimeout(() => { S.sel = null; S.sheet = 'peek'; marcaSel(null); renderMapUI(); }, 380); }
+    else { S.sheet = k; vai(y); } };
+  zona.forEach(z => {
+    z.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; ativo = true; try { z.setPointerCapture(e.pointerId); } catch (er) {} b0 = pos(); vai(b0, true); y0 = e.clientY; hist = [[e.clientY, e.timeStamp]]; });
+    z.addEventListener('pointermove', e => { if (!ativo) return; let y = b0 + e.clientY - y0; if (y < 0) y = -rubber(-y, H()); vai(y, true); hist.push([e.clientY, e.timeStamp]); if (hist.length > 6) hist.shift(); });
+    z.addEventListener('pointerup', solta); z.addEventListener('pointercancel', solta);
+  });
+}
+function pgMapa() {
+  if (!$('#mapUI')) $('#mapWrap').insertAdjacentHTML('beforeend', '<div id="mapUI"></div>');
+  renderMapUI(); initMap(); if (mapOk) atualizaMapa();
+}
+
+/* ================= tela 3: ficha do bem ================= */
+function pgBem(slug) {
+  const b = BY[slug]; if (!b || !b.named) return pgNaoEncontrada();
+  const full = slug === 'edificio-martinelli', t = T[S.lang], fo = fotosDe(b), top = ORG[b.org.includes('iphan') ? 'iphan' : b.org.includes('condephaat') ? 'condephaat' : 'conpresp'];
+  const ni = `<span class="ni">${t.ni}</span>`, cab = n => `<span class="eyebrow">${n} · ${t.b[n - 1]}</span>`;
+  const ftParcial = [['Denominação oficial', b.nome], ['Endereço completo', b.end], ['Distrito', DNOME[b.d]], ['Autor ou projetista', b.arq], ['Tipologia', b.tip], ['Estilo arquitetônico', b.est], ['Instância e órgão', b.org.map(o => INST[ORG[o].inst].rot + ': ' + ORG[o].sigla).join('; ')]].filter(r => r[1]);
+  const proximos = BENS.filter(x => x !== b).map(x => [x, dist([b.lng, b.lat], [x.lng, x.lat])]).filter(x => x[1] <= 500).sort((a, c) => (c[0].named - a[0].named) || a[1] - c[1]).slice(0, 6);
+  const v = full && S.mart.ver;
+  const arqP = fo.arq[0], atP = fo.at[0];
+  const ph = (im, lab) => im ? `<figure><div class="ph-img" data-act="zoom" data-src="${im.src}" data-alt="${im.alt}" role="button" tabindex="0" aria-label="Ampliar: ${im.alt}"><span class="lab">${lab} · ${im.data.slice(-4)}</span>${imgTag(im)}</div><figcaption class="cr">${im.data} · ${im.cred} · ${im.lic}</figcaption></figure>`
+    : `<figure><div class="ph-img noimg" style="cursor:default"><span><b>${lab}</b><br>imagem não disponível</span></div><figcaption class="cr">&nbsp;</figcaption></figure>`;
+  const galeria = full && fo.at.length > 1 ? `<p class="small" style="margin-top:1rem"><b>Fotos de arquivo:</b> ${fo.arq.length} · <b>Fotos atuais:</b> ${fo.at.length}</p><div style="display:flex;gap:.5rem;flex-wrap:wrap">${[...fo.arq, ...fo.at].map(im => `<button class="btn ghost" style="padding:0;height:auto" data-act="zoom" data-src="${im.src}" data-alt="${im.alt}" aria-label="Ampliar: ${im.alt}"><img src="${im.src}" alt="" style="width:5.5rem;height:4.5rem;object-fit:cover;border-radius:6px"></button>`).join('')}</div>` : '';
+  const cmp = S.cmp === 'cmp' && arqP && atP && innerWidth >= 900;
+  return hdr('bem') + `<div class="wrap" lang="${S.lang === 'pt' ? 'pt-BR' : S.lang}">
+  <nav class="crumbs" aria-label="Você está em"><a href="#/">Cidade de São Paulo</a>›<a href="#/distrito/${b.d}/">Distrito ${DNOME[b.d]}</a>${b.log ? `›<a href="#/logradouro/${b.log}/">${b.logN}</a>` : ''}›<span aria-current="page">${b.nome}</span></nav>
+  <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center"><span class="rota">/bem/${slug}/</span> ${modTag(1)}
+    <div class="lang" role="group" aria-label="Idioma">${modMn(3)}${['pt','en','es'].map(l => `<button data-lang="${l}" aria-pressed="${S.lang === l}">${l.toUpperCase()}</button>`).join('')}</div></div>
+  ${t.aviso ? `<p class="ex-banner">${ic('alert')}<span>${t.aviso}</span></p>` : ''}
+
+  <section class="f-head" aria-labelledby="h1">
+    <div>${cab(1)}<h1 id="h1">${b.nome}</h1><p class="end">${b.end} · Distrito ${DNOME[b.d]} · São Paulo</p><div class="row" style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">${instTags(b)}${favBtn(slug)}</div>
+    ${full ? `<p class="small mut" style="margin:.75rem 0 0">Cabeçalho, ficha técnica e linha do tempo conferidos em fontes públicas. O texto curatorial é de exemplo.</p>` : `<p class="ex-banner">${ic('alert')}<span><b>Ficha parcial de exemplo.</b> Mostra como a página se comporta quando faltam conteúdos; os dados deste bem ainda serão conferidos.</span></p>`}</div>
+    <div class="selo-inst ${top.cls}"><small>Tombado · ${INST[top.inst].rot.toLowerCase()}</small><b>${top.sigla}</b><small>${full ? 'Resolução 37/92' : 'resolução a conferir'}</small></div>
+  </section>
+
+  <section class="bloco" aria-labelledby="b2">${cab(2)}<h2 id="b2">${t.b[1]}</h2>
+    ${arqP && atP ? `<div class="cmp-tabs only-d" role="group" aria-label="Modo de comparação"><button class="btn sm" data-cmp="lado" aria-pressed="${!cmp}">Lado a lado</button><button class="btn sm" data-cmp="cmp" aria-pressed="${cmp}">Comparar com o controle</button></div>` : ''}
+    ${cmp ? `<div class="cmp-slider" id="cmpS"><img src="${atP.src}" alt="${atP.alt}"><img class="top" id="cmpTop" src="${arqP.src}" alt="${arqP.alt}"><span class="bar" id="cmpBar"></span><span class="lab" style="left:.6rem">${t.ant} · ${arqP.data}</span><span class="lab" style="right:.6rem">${t.hoje} · ${atP.data.slice(-4)}</span></div>
+      <label class="sr" for="cmpR">Posição do comparador</label><input class="cmp-range" id="cmpR" type="range" min="0" max="100" value="50">
+      <p class="small mut">As duas fotos têm ângulos diferentes. Para o comparador funcionar bem, a curadoria precisa de pares tirados do mesmo ponto.</p>`
+      : `<div class="cmp-pair">${ph(arqP, t.ant)}${ph(atP, t.hoje)}</div>`}
+    ${galeria}
+  </section>
+
+  <section class="bloco" aria-labelledby="b3">${cab(3)}<h2 id="b3">${t.b[2]} ${full ? '<span class="tag ex" style="vertical-align:middle">texto de exemplo, curadoria do Movimento SP Restauro e Memória</span>' : ''}</h2>
+    ${full ? `<div class="prose">${S.mart.textoPub || MART.texto}</div>
+    <aside class="sugbox"><span class="tag sug">sugestão, fora do TR</span><p style="margin:.5rem 0 .25rem"><b>Bloco opcional "Detalhes"</b>: pequenas seções sobre um elemento do prédio (o coroamento, o saguão, as esquadrias), com foto própria, dentro do texto curatorial e sem mudar a ordem dos blocos.</p><p class="small mut" style="margin:0">Faz sentido para a curadoria? Se sim, entra no dicionário de campos.</p></aside>` : `<p>${ni}: texto curatorial em produção pela curadoria.</p>`}
+  </section>
+
+  <section class="bloco" aria-labelledby="b4">${cab(4)}<h2 id="b4">${t.b[3]}</h2>
+    ${full ? `<ol class="tl">${MART.tl.map(([a, d, tb]) => `<li class="${tb ? 'tb' : ''}"><b>${a}</b><span>${d}</span></li>`).join('')}</ol>` : `<p>${ni}: marcos ainda não cadastrados.</p>`}
+  </section>
+
+  <section class="bloco" aria-labelledby="b5">${cab(5)}<h2 id="b5">${t.b[4]}</h2>
+    <dl class="ft">${(full ? ftMart() : ftParcial).map(([k, val]) => `<div><dt>${k}</dt><dd>${k === 'Autor ou projetista' ? `${val} <span class="tag sug" title="Página de arquiteto: sugestão fora do TR">página do arquiteto: sugestão</span>` : val}</dd></div>`).join('')}</dl>
+    ${full ? '' : '<p class="small mut">Campos sem dado ficam ocultos, como pede o TR.</p>'}
+  </section>
+
+  <section class="bloco" aria-labelledby="b6">${cab(6)}<h2 id="b6">${t.b[5]}</h2>
+    <dl class="vis">${(full ? MART.vis : [['Aberto ao público', null], ['Condições de visita', null], ['Agendamento', null]]).map(([k, val]) => `<div><dt>${k}</dt><dd>${val || ni}</dd></div>`).join('')}</dl>
+  </section>
+
+  <section class="bloco" aria-labelledby="b7">${cab(7)}<h2 id="b7">${t.b[6]}</h2>
+    <div class="loc"><div><div id="miniMap" role="region" aria-label="Mapa de localização de ${b.nome}"></div><p class="small mut">${full ? 'Em destaque, o perímetro de proteção do Vale do Anhangabaú (contorno ilustrativo; o real é desenhado a partir da resolução).' : 'Mapa de contexto com o ponto do bem.'}</p></div>
+    <div><h3 style="font-size:1rem;margin-bottom:.4rem">Bens tombados a até 500 m</h3><ul class="prox">${proximos.map(([x, d]) => `<li>${x.named ? `<a href="#/bem/${x.slug}/">${x.nome}</a>` : `<button class="btn ghost sm" style="padding:0;min-height:0" data-act="ver" data-slug="${x.slug}">${x.nome}</button>`}<span class="mut small">${Math.round(d / 10) * 10} m</span></li>`).join('')}</ul>
+    <button class="btn sm" style="margin-top:.75rem" data-act="ver" data-slug="${slug}">${ic('map')} Ver no mapa principal</button></div></div>
+  </section>
+
+  <section class="bloco" aria-labelledby="b8">${cab(8)}<h2 id="b8">${t.b[7]}</h2>
+    <div class="refs">${full ? `<h3 style="font-size:1rem">Fontes do verbete</h3><ol>${MART.refs.map(r => `<li>${r}</li>`).join('')}</ol>` : `<p>Fontes do verbete: ${ni}.</p>`}
+    <h3 style="font-size:1rem">Imagens</h3><ul>${[...fo.arq, ...fo.at].map(im => `<li>${im.tipo === 'arquivo' ? 'Foto de arquivo' : 'Foto atual'}, ${im.data}: ${im.cred}. Licença: ${im.lic}. <a href="${im.url}" target="_blank" rel="noopener">Wikimedia Commons</a></li>`).join('') || `<li>${ni}</li>`}</ul></div>
+  </section>
+
+  <section class="bloco" aria-labelledby="b9">${cab(9)}<h2 id="b9">${t.b[8]}</h2>
+    <div class="share">
+    <div class="acts"><span class="permalink">encontrocomopatrimonio.org.br/bem/${slug}/</span><span class="small mut">Domínio ilustrativo.</span>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap"><button class="btn" data-act="copiar" data-slug="${slug}">${ic('link')} Copiar link</button><button class="btn" data-act="compartilhar" data-slug="${slug}">${ic('share')} Compartilhar</button><button class="btn" data-act="imprimir">${ic('print')} Imprimir ficha</button></div></div></div>
+  </section>
+
+  <footer class="pfoot"><span>${full ? `Versão ${v} · ${S.mart.pubEm ? 'publicada em ' + S.mart.pubEm : 'publicada em 03/09/2026'} · ` : ''}Conteúdo: Movimento São Paulo Restauro e Memória</span>${patHTML()}</footer>
+  </div>`;
+}
+function posBem(slug) {
+  const b = BY[slug]; if (!b || !b.named) return;
+  const r = $('#cmpR'); if (r) r.oninput = () => { $('#cmpTop').style.clipPath = `inset(0 ${100 - r.value}% 0 0)`; $('#cmpBar').style.left = r.value + '%'; };
+  miniMap('miniMap', { center:[b.lng, b.lat], zoom:15.5, load:m => {
+    if (slug === 'edificio-martinelli') { m.addSource('env', { type:'geojson', data:circulo([-46.6375, -23.5465], 380) });
+      m.addLayer({ id:'env', type:'fill', source:'env', paint:{ 'fill-color':'#E8402A', 'fill-opacity':.12 } }); m.addLayer({ id:'env-l', type:'line', source:'env', paint:{ 'line-color':'#B92E1B', 'line-width':2, 'line-dasharray':[2, 2] } }); }
+    pontos(m, BENS.filter(x => dist([b.lng, b.lat], [x.lng, x.lat]) < 900), 4);
+    m.addSource('me', { type:'geojson', data:fc([b]) }); m.addLayer({ id:'me', type:'circle', source:'me', paint:{ 'circle-radius':10, 'circle-color':'#B92E1B', 'circle-stroke-color':'#fff', 'circle-stroke-width':3 } }); } });
+}
+
+/* ================= tela 4: distrito (e logradouro) ================= */
+function listaHTML(arr, comNum) {
+  return `<ul class="lista">${arr.map(b => `<li><div>${b.named ? `<a class="n" href="#/bem/${b.slug}/">${b.nome}</a>` : `<button class="btn ghost" style="padding:0;min-height:0;font-weight:600" data-act="ver" data-slug="${b.slug}">${b.nome}</button>`}
+    <div class="small mut">${comNum ? b.end + ' · lado ímpar · ' : b.end ? b.end + ' · ' : ''}${b.tip} · ${b.per}</div></div><div class="c3">${instTags(b)}</div><div class="small mut">${b.est || ''}</div></li>`).join('')}</ul>`;
+}
+function pgDistritos() {
+  const ds = DIST.filter(d => d[0] !== 'outros').map(d => { const arr = BENS.filter(b => b.d === d[0]); return { d, n:arr.length, o:Object.keys(ORG).map(k => [k, cnt(arr, b => b.org.includes(k))]) }; }).sort((a, b) => b.n - a.n);
+  const outros = cnt(BENS, b => b.d === 'outros');
+  return hdr('distrito') + `<div class="wrap">
+  <nav class="crumbs" aria-label="Você está em"><a href="#/">Cidade de São Paulo</a>›<span aria-current="page">Distritos</span></nav><span class="rota">/distritos/</span> ${modTag(2)}
+  <h1 style="font-size:clamp(1.9rem,4vw,2.75rem);margin:1rem 0 .5rem">Distritos</h1>
+  <p class="prose mut" style="margin:0">São Paulo é dividida em 96 distritos. Escolha um para ver os bens tombados dele, com indicadores e a lista completa.</p>
+  <label class="dbusca"><span class="sr">Buscar distrito</span>${ic('search')}<input id="dq" type="search" autocomplete="off" placeholder="Buscar distrito ou bairro"></label>
+  <ul class="rcards">${ds.map(({ d, n, o }) => `<li data-dn="${norm(d[1])}"><a class="rcard" href="#/distrito/${d[0]}/"><h2>${d[1]}</h2>
+    <p><span class="dn">${fmt(n)}</span> <span class="mut">bens tombados</span></p>
+    <span class="dbar" aria-hidden="true">${o.map(([k, v]) => `<i style="width:${(v / o.reduce((a, x) => a + x[1], 0) * 100).toFixed(1)}%;background:var(--${ORG[k].cls})"></i>`).join('')}</span>
+    <span class="dinst small">${o.map(([k, v]) => `<span class="inst ${ORG[k].cls}"><i></i>${ORG[k].sigla} ${fmt(v)}</span>`).join('')}</span>
+    <span class="go" style="margin-top:auto">Ver distrito ${ic('arrow')}</span></a></li>`).join('')}</ul>
+  <p class="mut" id="dvazio" hidden>Nenhum distrito com esse nome nesta amostra.</p>
+  <p class="small mut">Amostra do protótipo: ${ds.length} distritos com página. Outros ${fmt(outros)} bens estão nos demais distritos e aparecem no mapa. No sistema, todos os 96 distritos têm página.</p>
+  <footer class="pfoot"><span>Conteúdo: Movimento São Paulo Restauro e Memória</span>${patHTML()}</footer></div>`;
+}
+function pgDistrito(slug) {
+  const d = DIST.find(x => x[0] === slug); if (!d) return pgNaoEncontrada();
+  const arr = BENS.filter(b => b.d === slug), n = arr.length, POR = 20;
+  const ord = { rel:(a, b) => b.rel - a.rel, nome:(a, b) => a.nome.localeCompare(b.nome, 'pt-BR'), tomb:(a, b) => (a.tomb || 9999) - (b.tomb || 9999) }[S.distOrd] || ((a, b) => b.rel - a.rel);
+  const lista = [...arr].sort(ord), pags = Math.ceil(n / POR), pg = Math.min(S.distPag, pags);
+  const barras = (rows, cor) => `<ul class="bars">${rows.map(([k, v, c]) => `<li><span>${k}</span><span class="v">${fmt(v)}</span><span class="b"><i style="width:${(v / n * 100).toFixed(1)}%;background:${c || cor}"></i></span></li>`).join('')}</ul>`;
+  const tips = TIPS.map(t => [t, cnt(arr, b => b.tip === t)]).sort((a, b) => b[1] - a[1]), ests = ESTS.map(t => [t, cnt(arr, b => b.est === t)]).sort((a, b) => b[1] - a[1]);
+  return hdr('distrito') + `<div class="wrap">
+  <nav class="crumbs" aria-label="Você está em"><a href="#/">Cidade de São Paulo</a>›<a href="#/distritos/">Distritos</a>›<span aria-current="page">${d[1]}</span></nav><span class="rota">/distrito/${slug}/</span> ${modTag(2)}
+  <div class="dhead" style="margin-top:1rem"><div><h1>Bens tombados no distrito ${d[1]}</h1>
+    <p style="font-size:1.1rem">${fmt(n)} bens tombados nas três instâncias, ou ${(n / BENS.length * 100).toFixed(1).replace('.', ',')}% dos ${fmt(BENS.length)} bens da cidade.</p>
+    <p class="ex-banner">${ic('alert')}<span>Lista de amostra: só o Edifício Martinelli tem dados conferidos. Órgãos, tipologias e estilos dos demais são ilustrativos.</span></p></div>
+    <div id="ctxMap" role="region" aria-label="Mapa de contexto do distrito"></div></div>
+  <div class="ind">
+    <div><h3>Por órgão</h3>${barras(Object.entries(ORG).map(([o, v]) => [v.sigla + ' (' + INST[v.inst].rot.toLowerCase() + ')', cnt(arr, b => b.org.includes(o)), INST[v.inst].cor]))}<p class="small mut">Um bem pode ter mais de um órgão.</p></div>
+    <div><h3>Por tipologia</h3>${barras(tips.slice(0, 5).concat([['Demais tipologias', tips.slice(5).reduce((a, x) => a + x[1], 0)]]), '#6B605C')}</div>
+    <div><h3>Por estilo arquitetônico</h3>${barras(ests.slice(0, 5).concat([['Demais estilos', ests.slice(5).reduce((a, x) => a + x[1], 0)]]), '#6B605C')}</div>
+  </div>
+  <div class="ltools"><h2 style="font-size:1.25rem">Todos os bens do distrito</h2><label class="small">Ordenar por <select id="ordD" data-act-change="ord">${[['rel','Relevância'],['nome','Ordem alfabética'],['tomb','Ano de tombamento']].map(([k, t]) => `<option value="${k}" ${S.distOrd === k ? 'selected' : ''}>${t}</option>`).join('')}</select></label></div>
+  ${listaHTML(lista.slice((pg - 1) * POR, pg * POR))}
+  <div class="pag"><button class="btn sm" data-pag="${pg - 1}" ${pg <= 1 ? 'disabled' : ''}>Anterior</button><span>Página ${pg} de ${pags} · ${fmt(n)} bens</span><button class="btn sm" data-pag="${pg + 1}" ${pg >= pags ? 'disabled' : ''}>Próxima</button></div>
+  <footer class="pfoot"><span>Página indexável por distrito (nível 1 do TR), com URL própria.</span>${patHTML()}</footer>
+  </div>`;
+}
+function posDistrito(slug) {
+  const arr = BENS.filter(b => b.d === slug); if (!arr.length) return;
+  const lo = arr.map(b => b.lng), la = arr.map(b => b.lat);
+  const m = miniMap('ctxMap', { center:[(Math.min(...lo) + Math.max(...lo)) / 2, (Math.min(...la) + Math.max(...la)) / 2], zoom:13, load:mm => { pontos(mm, arr, 3); mm.fitBounds([[Math.min(...lo), Math.min(...la)], [Math.max(...lo), Math.max(...la)]], { padding:20, duration:0 }); } });
+}
+function pgLogradouro(slug) {
+  const arr = NAMED.filter(b => b.log === slug).map(b => BY[b.slug]); if (!arr.length) return pgNaoEncontrada();
+  const b0 = arr[0];
+  return hdr('distrito') + `<div class="wrap"><nav class="crumbs" aria-label="Você está em"><a href="#/">Cidade de São Paulo</a>›<a href="#/distrito/${b0.d}/">Distrito ${DNOME[b0.d]}</a>›<span aria-current="page">${b0.logN}</span></nav><span class="rota">/logradouro/${slug}/</span> ${modTag(2)}
+  <h1 style="font-size:2rem;margin:1rem 0 .5rem">Bens tombados na ${b0.logN}</h1><p class="mut">Nível 2 do TR: recorte de rua, com número e lado da via. Nesta amostra, só o Martinelli está ligado ao logradouro.</p>
+  ${listaHTML(arr, true)}</div>`;
+}
+</script>
+<script>
+Object.assign(S, { tipOff:[], cmp:'lado', revSel:null, taxTab:'tip', devolvidos:store.get('ep-dev', 0), imp:1, salvo:false, sheet:'peek', selAnim:false, salvos:store.get('ep-salvos', ['theatro-municipal','edificio-italia']) });
+// o que a revisora publica passa a valer na ficha pública
+function aplicaPub() { const c = S.mart.pubCampos; if (!c) return; const b = BY['edificio-martinelli'];
+  b.nome = c.nome || b.nome; b.end = c.end || b.end; b.cons = +c.cons || b.cons;
+  MART.vis = [['Aberto ao público', c.aberto || null], ['Condições de visita', c.visita || null], ['Agendamento', c.agend || null]]; } // cons e acess ficam só na base técnica
+aplicaPub();
+
+/* ================= tela 5: roteiro ================= */
+function rotStats(r) {
+  const st = r.paradas.map(p => BY[p[0]]); let m = 0; for (let i = 1; i < st.length; i++) m += dist([st[i - 1].lng, st[i - 1].lat], [st[i].lng, st[i].lat]);
+  const km = m * 1.3 / 1000; // shortcut: distância em linha reta × 1,3 como estimativa a pé; no sistema, usar rota real
+  return { km:km.toFixed(1).replace('.', ','), min:Math.max(5, Math.round(km / 4.5 * 60 / 5) * 5), st };
+}
+function pgRoteiros() {
+  return hdr('roteiro') + `<div class="wrap">
+  <nav class="crumbs" aria-label="Você está em"><a href="#/">Cidade de São Paulo</a>›<span aria-current="page">Roteiros</span></nav><span class="rota">/roteiros/</span> ${modTag(3)}
+  <div style="margin-top:1rem"><span class="tag ex">texto de exemplo</span>
+  <h1 style="font-size:clamp(1.9rem,4vw,2.75rem);margin:.5rem 0">Roteiros</h1>
+  <p class="prose mut" style="margin:0">Percursos a pé pelo patrimônio da cidade, montados pela curadoria. Escolha um para ver as paradas e o mapa.</p></div>
+  <ul class="rcards">${ROTEIROS.filter(r => r.st === 'publicado').map(r => { const { km, min, st } = rotStats(r);
+    return `<li><a class="rcard" href="#/roteiros/${r.slug}/"><h2>${r.nome}</h2><p class="mut">${r.resumo}</p>
+    <ol class="rc-st" aria-label="Paradas">${st.map(b => `<li>${b.nome}</li>`).join('')}</ol>
+    <p class="meta">${st.length} paradas · cerca de ${km} km · uns ${min} min a pé</p><span class="go">Ver roteiro ${ic('arrow')}</span></a></li>`; }).join('')}</ul>
+  <footer class="pfoot"><span>Roteiros são criados e ordenados pelo painel (Taxonomia e filtros).</span>${patHTML()}</footer></div>`;
+}
+function pgRoteiro(slug) {
+  const R = ROTEIROS.find(x => x.slug === slug && x.st === 'publicado'); if (!R) return pgNaoEncontrada();
+  const { km, min, st } = rotStats(R), txt = Object.fromEntries(R.paradas);
+  return hdr('roteiro') + `<div class="wrap">
+  <nav class="crumbs" aria-label="Você está em"><a href="#/">Cidade de São Paulo</a>›<a href="#/roteiros/">Roteiros</a>›<span aria-current="page">${R.nome}</span></nav><span class="rota">/roteiros/${slug}/</span> ${modTag(3)}
+  <div class="rot" style="margin-top:1rem"><div>
+    <span class="tag ex">texto de exemplo</span>
+    <h1 style="font-size:clamp(1.9rem,4vw,2.75rem);margin:.5rem 0">${R.nome}</h1>
+    <p class="prose" style="font-size:1.0625rem">${R.apres}</p>
+    <p class="mut">${st.length} paradas · cerca de ${km} km · uns ${min} minutos a pé, sem contar as paradas (estimativa)</p>
+    <ol class="paradas">${st.map((b, i) => `<li><span class="nn" aria-hidden="true">${i + 1}</span><div><h3>${b.named && b.ficha !== 'base' ? `<a href="#/bem/${b.slug}/">${b.nome}</a>` : b.nome}</h3><p class="small mut" style="margin:.15rem 0">${b.end}</p><p style="margin:.35rem 0">${txt[b.slug]}</p>${b.ficha === 'base' ? '<p class="small mut" style="margin:0">Ficha curatorial em produção.</p>' : ''}</div></li>`).join('')}</ol>
+  </div><div id="rotMap" role="region" aria-label="Mapa do percurso"></div></div>
+  <footer class="pfoot"><span>Roteiros são criados e ordenados pelo painel (Taxonomia e filtros).</span>${patHTML()}</footer></div>`;
+}
+function posRoteiro(slug) {
+  const R = ROTEIROS.find(x => x.slug === slug && x.st === 'publicado'); if (!R || R.paradas.length < 2) return;
+  const { st } = rotStats(R), co = st.map(b => [b.lng, b.lat]);
+  miniMap('rotMap', { center:co[0], zoom:15.2, load:m => {
+    m.addSource('r', { type:'geojson', data:{ type:'Feature', geometry:{ type:'LineString', coordinates:co } } });
+    m.addLayer({ id:'r', type:'line', source:'r', paint:{ 'line-color':'#B92E1B', 'line-width':3, 'line-dasharray':[1.5, 1.5] } });
+    st.forEach((b, i) => { const el = document.createElement('div'); el.textContent = i + 1; el.style.cssText = 'width:28px;height:28px;border-radius:50%;background:#B92E1B;color:#fff;font:700 13px Poppins,sans-serif;display:grid;place-items:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)'; new maplibregl.Marker({ element:el }).setLngLat([b.lng, b.lat]).addTo(m); });
+    m.fitBounds([[Math.min(...co.map(c => c[0])), Math.min(...co.map(c => c[1]))], [Math.max(...co.map(c => c[0])), Math.max(...co.map(c => c[1]))]], { padding:50, duration:0 }); } });
+}
+
+/* ================= tela 6: sobre ================= */
+function pgSobre() {
+  return hdr('sobre') + `<div class="wrap"><span class="rota">/sobre/</span> ${modTag(1)}<div class="prose" style="margin-top:1rem">
+  <h1 style="font-size:2.25rem;margin-bottom:1rem">Sobre o Encontro com o Patrimônio</h1>
+  <p>São Paulo tem cerca de 2.500 bens tombados nas três instâncias de proteção. Até aqui, eles estavam espalhados em listas com critérios e formatos diferentes. Este site reúne todos num mapa só e dá a cada um uma ficha curatorial.</p>
+  <h3>De onde vêm os dados</h3><p>A localização e o enquadramento legal vêm das listas do Conpresp (municipal), do Condephaat (estadual) e do IPHAN (federal), cadastradas e conferidas pela equipe de curadoria. Quando o mesmo bem é protegido por mais de um órgão, ele aparece uma vez só, com todos os órgãos.</p>
+  <h3>Como as fichas são escritas</h3><p>Os textos são da curadoria do Movimento São Paulo Restauro e Memória. Cada ficha passa por edição e revisão antes de ser publicada, e toda imagem traz data, crédito e licença.</p>
+  <h3>Avaliação técnica</h3><p>O estado de conservação e a acessibilidade de cada bem ficam numa base interna da curadoria, usada para pesquisa. Eles não aparecem nas fichas públicas.</p></div>
+  <div class="prose"><h3>Créditos e licenças das imagens</h3><ul>${Object.values(IMG).map(im => `<li>${im.cred}, ${im.data}. ${im.lic}. <a href="${im.url}" target="_blank" rel="noopener">Wikimedia Commons</a></li>`).join('')}</ul>
+  <h3>Privacidade</h3><p>O site não tem cadastro de visitantes e não guarda dados pessoais do público.</p>
+  <h3>Patrocínio</h3></div>${patHTML('sobre')}</div>`;
+}
+function pgConta() {
+  const lista = S.salvos.map(s => BY[s]).filter(Boolean);
+  return hdr('conta') + `<div class="wrap"><span class="rota">/minha-conta/</span>
+  <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:flex-end;margin:1rem 0 1.5rem"><div><span class="tag sug">sugestão, fora do TR</span><h1 style="font-size:2rem;margin:.5rem 0 .25rem">Olá, Camila</h1><p class="mut" style="margin:0">camila.duarte@exemplo.org</p></div><button class="btn" data-act="sair">Sair</button></div>
+  <h2 style="font-size:1.25rem;margin-bottom:.5rem">Bens salvos (${lista.length})</h2>
+  ${lista.length ? `<ul class="salvos">${lista.map(b => { const f = fotosDe(b), im = f.at[0] || f.arq[0];
+    return `<li><span class="th">${im ? `<img src="${im.src}" alt="">` : ''}</span><div>${b.ficha !== 'base' ? `<a class="n" style="font-weight:600" href="#/bem/${b.slug}/">${b.nome}</a>` : `<b>${b.nome}</b>`}<div class="small mut">${b.end} · ${DNOME[b.d]}</div></div><span style="display:flex;gap:.4rem"><button class="btn sm" data-act="ver" data-slug="${b.slug}">${ic('map')} No mapa</button><button class="btn sm" data-act="favoritar" data-slug="${b.slug}">Remover</button></span></li>`; }).join('')}</ul>`
+    : `<p class="mut">Nenhum bem salvo ainda. Use o botão "Salvar" no mapa ou na ficha de um bem.</p>`}
+  <div class="lgpd" style="margin-top:2rem">${ic('check')}<div><b>Seus dados</b><p style="margin:.25rem 0 .75rem">A conta guarda só seu nome, seu e-mail e a lista acima. Nada de histórico de navegação ou localização.</p><div style="display:flex;gap:.5rem;flex-wrap:wrap"><button class="btn sm" data-act="meus-dados">${ic('download')} Baixar meus dados</button><button class="btn sm" data-act="excluir-conta">Excluir conta</button></div></div></div>
+  </div>`;
+}
+function pgNaoEncontrada() { return hdr('') + `<div class="wrap"><h1 style="margin:1rem 0">Página não encontrada</h1><p>Esta página não existe no protótipo. <a href="#/">Voltar ao mapa</a>.</p></div>`; }
+
+/* ================= painel da equipe ================= */
+const QUEM = { curador:['Marina Okabe','Curadora'], admin:['Raquel Nery','Administradora'] };
+const nRasc = () => 14 + (S.mart.status === 'rascunho' ? 1 : 0) + S.devolvidos + S.novos.filter(b => b.st === 'rascunho').length;
+const nRev = () => S.fila.length + (S.mart.status === 'revisao' ? 1 : 0);
+function adm(on, inner) {
+  const nav = [['bens','Bens','building'],['revisao','Fila de revisão','inbox', nRev()],...(S.role === 'admin' ? [['taxonomia','Taxonomia e filtros','tags'], ['patrocinio','Patrocínio','image'], ['usuarios','Usuários e perfis','users']] : [])];
+  return `<div class="adm"><aside class="adm-side"><a class="logo" href="#/painel/${nav[0][0]}"><b>Encontro com o Patrimônio</b><small>Painel da equipe</small></a>
+  <nav aria-label="Painel">${nav.map(([k, t, i, c]) => `<a href="#/painel/${k}" class="${on === k ? 'on' : ''}" ${on === k ? 'aria-current="page"' : ''}>${ic(i)}${t}${c ? `<span class="cnt">${c}</span>` : ''}${c ? '' : modMn(1)}</a>`).join('')}</nav>
+  <div class="adm-who"><b>${QUEM[S.role][0]}</b><span>${QUEM[S.role][1]}</span><button data-act="perfil">Trocar perfil</button></div></aside>
+  <main class="adm-main">${inner}</main></div>`;
+}
+const LINHAS = [
+  ['edificio-martinelli','Marina Okabe','03/09/2026'],['edificio-altino-arantes','Thiago Brandão','10/11/2026'],['edificio-prudencia','Marina Okabe','09/11/2026'],
+  ['edificio-sampaio-moreira','Thiago Brandão','13/11/2026'],['theatro-municipal','Marina Okabe','12/11/2026'],['catedral-da-se','Thiago Brandão','21/10/2026'],
+  ['patio-do-colegio','Marina Okabe','14/10/2026'],['mosteiro-de-sao-bento','Thiago Brandão','07/10/2026'],['edificio-italia','Marina Okabe','30/09/2026'],['solar-da-marquesa-de-santos','Thiago Brandão','23/09/2026']];
+function stOf(slug) { if (slug === 'edificio-martinelli') return S.mart.status; if (S.fila.includes(slug)) return 'revisao'; if (novoDe(slug)) return novoDe(slug).st; if (['edificio-altino-arantes','edificio-prudencia'].includes(slug)) return 'rascunho'; return 'publicado'; }
+const ST = { publicado:['pub','Publicado'], rascunho:['ras','Rascunho'], revisao:['rev','Em revisão'], despublicado:['des','Despublicado'] };
+const stHTML = (s, slug) => `<span class="st ${ST[s][0]}"><i></i>${ST[s][1]}${s !== 'publicado' && s !== 'despublicado' ? `<br><span class="small mut" style="font-weight:400">${slug && novoDe(slug) ? 'ainda não está no site' : 'versão anterior no site'}</span>` : ''}</span>`;
+function compl(slug) { const n = slug === 'edificio-martinelli' ? 9 : slug === 'edificio-altino-arantes' ? 6 : slug === 'edificio-prudencia' ? 5 : novoDe(slug) ? 2 : 4, fo = fotosDe(BY[slug]);
+  return `<span class="compl"><span class="b"><i style="width:${(n / 9 * 100).toFixed(1)}%"></i></span>${n}/9</span><span class="small mut" style="display:block">arquivo ${fo.arq.length ? 'sim' : 'não'} · atual ${fo.at.length ? 'sim' : 'não'}</span>`; }
+function pgBens() {
+  const fs = S.fBens || { q:'', st:'', d:'' };
+  const rows = [...S.novos.map(b => [b.slug, b.autor, b.em]), ...LINHAS].filter(([s]) => { const b = BY[s]; return (!fs.q || norm(b.nome).includes(norm(fs.q))) && (!fs.st || stOf(s) === fs.st) && (!fs.d || b.d === fs.d); });
+  return adm('bens', `<div class="adm-top"><div><h1>Bens ${modTag(1)}</h1><p>Rota: <span class="rota">/painel/bens</span></p></div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap"><a class="btn pri" href="#/painel/bens/novo">${ic('plus')} Novo bem</a><button class="btn" data-act="importar">${ic('upload')} Importar planilha ${modMn(2)}</button><button class="btn" data-act="exp-csv">${ic('download')} Exportar CSV ${modMn(2)}</button></div></div>
+  <p class="resumo"><b class="big">2.500</b> de 2.500 bens publicados no site. Em trabalho: <b>${nRasc()} rascunhos</b> e <b>${nRev()} em revisão</b> (versões novas e bens novos). Despublicados: 0. Fichas com os 9 blocos públicos completos: 1.${S.novos.length ? ` Cadastrados nesta demonstração: ${S.novos.length}.` : ''}</p>
+  <div class="box"><div class="tbar"><label class="sr" for="bq">Buscar bem</label><input id="bq" data-fb="q" placeholder="Buscar pelo nome" value="${fs.q.replace(/"/g, "&quot;")}" style="min-width:16rem">
+    <label class="sr" for="bst">Status</label><select id="bst" data-fb="st"><option value="">Todos os status</option>${Object.entries(ST).map(([k, v]) => `<option value="${k}" ${fs.st === k ? 'selected' : ''}>${v[1]}</option>`).join('')}</select>
+    <label class="sr" for="bd">Distrito</label><select id="bd" data-fb="d"><option value="">Todos os distritos</option>${DIST.filter(d => d[0] !== 'outros').map(d => `<option value="${d[0]}" ${fs.d === d[0] ? 'selected' : ''}>${d[1]}</option>`).join('')}</select>
+    <span class="small mut" style="margin-left:auto">Mostrando ${rows.length} de 2.500 (amostra)</span></div>
+  <table class="t"><thead><tr><th>Bem</th><th>Distrito</th><th>Instância</th><th>Status</th><th>Completude da ficha</th><th>Responsável</th><th>Atualizado</th><th></th></tr></thead><tbody>
+  ${rows.map(([s, resp, at]) => { const b = BY[s]; return `<tr><td><b>${b.nome}</b></td><td>${DNOME[b.d]}</td><td>${b.org.map(o => `<span class="inst ${ORG[o].cls}"><i></i>${ORG[o].sigla}</span>`).join('<br>')}</td><td>${stHTML(stOf(s), s)}</td><td>${compl(s)}</td><td>${resp}</td><td>${s === 'edificio-martinelli' && S.mart.editEm ? S.mart.editEm : at}</td>
+    <td>${s === 'edificio-martinelli' ? `<a class="btn sm pri" href="#/painel/bens/edificio-martinelli">Editar</a>` : `<button class="btn sm" data-act="so-mart">Editar</button>`}</td></tr>`; }).join('') || '<tr><td colspan="8" class="mut">Nenhum bem com esses filtros.</td></tr>'}
+  </tbody></table></div>`);
+}
+
+/* ===== tela 8: editor do bem ===== */
+const LICS = ['Domínio público','CC0','CC BY 4.0','CC BY-SA 2.0','CC BY-SA 4.0','Uso autorizado pelo detentor'];
+const ORIG = { nome:'Edifício Martinelli', end:'Rua São Bento, 405', cons:'2', vistoria:'14/08/2026', aberto:'Térreo com lojas', visita:'Visita ao terraço: consultar regras atuais', acess:'', agend:'' };
+function pgEditor() {
+  const m = S.mart, bloq = m.status === 'revisao', d = m.campos || ORIG;
+  const blocos = ['Cabeçalho de identificação','Par de imagens','Texto curatorial','Linha do tempo','Ficha técnica','Visitação','Localização e entorno','Referências e créditos','Compartilhamento'], tec = S.edTab === 'tec';
+  const f = (k, lab, extra = '') => `<div class="field"><label for="e-${k}">${lab}</label><input id="e-${k}" data-k="${k}" value="${d[k] || ''}" ${bloq ? 'disabled' : ''} ${extra}></div>`;
+  const imgRow = (im, novo) => `<div class="imgrow" ${novo ? 'id="novaImg"' : ''}><div class="th">${imgTag(im)}</div><div>
+    <p style="margin:0 0 .5rem"><b>${im.tipo === 'arquivo' ? 'Foto de arquivo' : 'Foto atual'}</b> ${novo ? '<span class="new-badge">nova, enviada agora: martinelli-terraco-2010.jpg</span>' : ''}</p>
+    <div class="g2"><div class="field" style="grid-column:1/-1"><label>Crédito <span class="req">*</span></label><input value="${im.cred}" ${novo ? 'id="ni-cred"' : 'disabled'}></div><div class="field"><label>Data <span class="req">*</span></label><input value="${im.data}" ${novo ? 'id="ni-data"' : 'disabled'}></div>
+    <div class="field ${novo && m.erroLic ? 'bad' : ''}"><label for="${novo ? 'ni-lic' : ''}">Licença de uso <span class="req">*</span></label><select ${novo ? 'id="ni-lic" aria-describedby="ni-err"' : 'disabled'} ${bloq ? 'disabled' : ''}><option value="">Escolha a licença</option>${LICS.map(l => `<option ${(novo ? m.imgLic : im.lic) === l ? 'selected' : ''}>${l}</option>`).join('')}</select>
+    ${novo && m.erroLic ? `<span class="ferr" id="ni-err">${ic('alert')} Informe a licença. Sem ela, a imagem não pode ser salva nem publicada.</span>` : ''}</div></div>
+    <div class="field" style="margin:0"><label>Texto alternativo <span class="req">*</span></label><input value="${im.alt}" ${novo ? '' : 'disabled'}></div></div></div>`;
+  return adm('bens', `<div class="adm-top"><div><a href="#/painel/bens" class="small">${ic('back')} Bens</a><h1>Edifício Martinelli ${modTag(1)}</h1><p>Rota: <span class="rota">/painel/bens/edificio-martinelli</span> · página pública: <span class="rota">/bem/edificio-martinelli/</span></p></div><div>${stHTML(m.status)}</div></div>
+  ${bloq ? `<p class="ex-banner">${ic('alert')}<span>Esta versão está em revisão. A edição volta a abrir depois que outra pessoa da curadoria publicar ou devolver.</span></p>` : ''}
+  ${m.comentario && m.status === 'rascunho' ? `<p class="ex-banner">${ic('alert')}<span><b>Devolvida por ${m.devPor || 'Raquel Nery'}:</b> ${m.comentario}</span></p>` : ''}
+  <div class="tabs" role="tablist" aria-label="Partes do cadastro"><button role="tab" data-edtab="pub" aria-selected="${!tec}" aria-controls="ed-pub">Ficha pública</button><button role="tab" data-edtab="tec" aria-selected="${tec}" aria-controls="ed-tec">Base técnica</button></div>
+  <div class="ed" id="ed-pub" ${tec ? 'hidden' : ''}><nav class="ed-nav" aria-label="Blocos da ficha"><p class="lbl" style="margin:0 0 .5rem">Os ${blocos.length} blocos da ficha pública</p><ol>${blocos.map((t, i) => `<li><a href="#" data-goto="eb${i + 1}"><span class="dot ${i === 1 && m.erroLic ? 'no' : ''}"></span>${i + 1}. ${t}</a></li>`).join('')}</ol></nav>
+  <div>
+    <section class="box ed-sec" id="eb1"><h2>1. Cabeçalho de identificação</h2><div class="g2">${f('nome', 'Denominação oficial')}${f('end', 'Endereço completo')}</div>
+      <div class="g2"><div class="field"><label for="e-d">Distrito</label><select id="e-d" disabled><option>Sé</option></select></div><div class="field"><span class="lbl">Instância e órgão</span><label class="chk"><input type="checkbox" checked disabled> Municipal: Conpresp</label><label class="chk"><input type="checkbox" disabled> Estadual: Condephaat</label><label class="chk"><input type="checkbox" disabled> Federal: IPHAN</label></div></div>
+      <p class="small mut" style="margin:0">Endereço da página: /bem/edificio-martinelli/ (gerado do nome, sem acentos e sem números de controle).</p></section>
+    <section class="box ed-sec" id="eb2"><h2>2. Par de imagens <small>crédito, data e licença obrigatórios em cada imagem</small></h2>
+      ${imgRow(IMG.martArq)}${m.fotos.map(k => imgRow(IMG[k])).join('')}${m.novaImg ? imgRow(IMG.martAt2, true) : m.fotos.includes('martAt2') ? '' : `<button class="btn" data-act="addImg" ${bloq ? 'disabled' : ''}>${ic('plus')} Adicionar foto atual</button>`}</section>
+    <section class="box ed-sec" id="eb3"><h2>3. Texto curatorial <small>subtítulos obrigatórios: contexto histórico, análise arquitetônica, valores de preservação</small></h2>
+      <div class="rte"><div class="rte-tb" role="toolbar" aria-label="Formatação"><button data-cmd="formatBlock" data-v="h3" title="Subtítulo">H</button><button data-cmd="bold" title="Negrito"><b>B</b></button><button data-cmd="italic" title="Itálico"><i>I</i></button><button data-cmd="insertUnorderedList" title="Lista">•</button><button data-act="link" title="Link">${ic('link')}</button></div>
+      <div class="rte-c" id="rte" contenteditable="${!bloq}" role="textbox" aria-multiline="true" aria-label="Texto curatorial">${m.texto || MART.texto}</div></div>
+      <p class="small mut">Texto de exemplo. A curadoria é do Movimento SP Restauro e Memória.</p></section>
+    <section class="box ed-sec" id="eb4"><h2>4. Linha do tempo</h2><table class="t"><thead><tr><th>Ano</th><th>Marco</th></tr></thead><tbody>${MART.tl.map(([a, t]) => `<tr><td>${a}</td><td>${t}</td></tr>`).join('')}</tbody></table><button class="btn sm" style="margin-top:.75rem" data-act="simul" ${bloq ? 'disabled' : ''}>${ic('plus')} Adicionar marco</button></section>
+    <section class="box ed-sec" id="eb5"><h2>5. Ficha técnica <small>campos vazios ficam ocultos na página</small></h2><dl class="ft" style="max-width:none">${ftMart().slice(3).map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl></section>
+    <section class="box ed-sec" id="eb6"><h2>6. Visitação <small>vazio aparece como "não informado"</small></h2><div class="g2">${f('aberto', 'Aberto ao público')}${f('visita', 'Condições de visita')}${f('agend', 'Agendamento', 'placeholder="não informado"')}</div><p class="small mut" style="margin:0">A acessibilidade física fica na aba Base técnica.</p></section>
+    <section class="box ed-sec" id="eb7"><h2>7. Localização e entorno</h2><div class="g3"><div class="field"><label>Latitude</label><input value="-23,5455" disabled></div><div class="field"><label>Longitude</label><input value="-46,6352" disabled></div><div class="field"><label for="e-raio">Raio dos bens próximos</label><select id="e-raio"><option>300 m</option><option selected>500 m</option><option>1 km</option></select></div></div><p class="small mut" style="margin:0">Ponto obtido do endereço no cadastro. Correção manual só pela administração.</p></section>
+    <section class="box ed-sec" id="eb8"><h2>8. Referências e créditos</h2><ol class="small">${MART.refs.map(r => `<li>${r}</li>`).join('')}</ol><p class="small mut" style="margin:0">Os créditos e as licenças das imagens entram sozinhos, a partir do bloco 2.</p></section>
+    <section class="box ed-sec" id="eb9"><h2>9. Compartilhamento</h2><p class="small" style="margin:0">Link permanente gerado para cada bem. Nada a preencher.</p></section>
+  </div>
+  <aside class="ed-aside"><div class="box"><h3>Prévia</h3><div class="prev-tabs"><button class="btn sm" data-prev="m" aria-pressed="${S.prev !== 'd'}">Celular</button><button class="btn sm" data-prev="d" aria-pressed="${S.prev === 'd'}">Computador</button></div>
+    <div class="prev ${S.prev === 'd' ? 'd' : 'm'}"><div class="pv-h"></div><div class="pv-b"><b>Edifício Martinelli</b>Rua São Bento, 405 · Sé<div class="pv-pair"><img src="${IMG.martArq.src}" alt=""><img src="${IMG[m.novaImg ? 'martAt2' : 'martAt'].src}" alt=""></div>${MART.resumo}</div></div></div>
+</aside></div>
+  <div id="ed-tec" ${tec ? '' : 'hidden'}><section class="box ed-sec" id="ebt" style="max-width:52rem"><h2>Base técnica <span class="tag tec">não aparece no site</span></h2>
+    <p class="mut" style="margin:.25rem 0 1rem">Avaliações internas da curadoria, para pesquisa e para o projeto técnico sobre a mesma base. Mudanças aqui também passam pela fila de revisão.</p>
+    <h3 style="font-size:1rem;margin:0 0 .5rem">Estado de conservação</h3><div class="g2"><div class="field"><label for="e-cons">Nível (1 a 5)</label><select id="e-cons" data-k="cons" ${bloq ? 'disabled' : ''}>${[1, 2, 3, 4, 5].map(k => `<option value="${k}" ${String(d.cons) === String(k) ? 'selected' : ''}>${k} · ${CONS[k].rot}</option>`).join('')}</select></div>${f('vistoria', 'Data da última vistoria')}</div>
+    <p class="small mut" style="margin:0 0 1rem">A escala de 5 níveis, com o critério de cada um, fica em Taxonomia e filtros.</p>
+    <h3 style="font-size:1rem;margin:0 0 .5rem">Acessibilidade física</h3><div class="g2">${f('acess', 'Condições de acessibilidade', 'placeholder="não verificado"')}</div>
+    <p class="small mut" style="margin:0">Verificar todos os bens exige pesquisa de campo. Enquanto isso, o dado fica só aqui.</p></section></div>
+    <div class="ed-foot"><span class="small mut">${S.salvo ? 'Rascunho salvo agora.' : 'Alterações ainda não salvas.'}</span><div style="display:flex;gap:.5rem"><button class="btn" data-act="salvar" ${bloq ? 'disabled' : ''}>Salvar rascunho</button><button class="btn pri" data-act="enviar" ${bloq ? 'disabled' : ''}>Enviar para revisão</button></div></div>`);
+}
+function lerCampos() { const o = { ...ORIG }; $$('[data-k]').forEach(el => o[el.dataset.k] = el.value); return o; }
+const paras = h => { const x = document.createElement('div'); x.innerHTML = h; return [...x.children].map(e => e.textContent.trim()).filter(Boolean); };
+function salvar(enviar) {
+  const m = S.mart; m.campos = lerCampos(); m.texto = $('#rte').innerHTML; m.imgLic = m.novaImg ? $('#ni-lic').value : '';
+  m.erroLic = m.novaImg && !m.imgLic;
+  if (m.erroLic) { saveMart(); render(); $('#ni-lic').focus(); toast('Rascunho não salvo: a foto nova está sem licença de uso.'); return; }
+  const diff = [];
+  if (m.novaImg) diff.push(['2 · Par de imagens', null, `Nova foto atual: ${IMG.martAt2.cred}, ${IMG.martAt2.data}, ${m.imgLic}`]);
+  const a = paras(m.textoPub || MART.texto), b = paras(m.texto), B = m.pubCampos || ORIG;
+  for (let i = 0; i < Math.max(a.length, b.length); i++) if (a[i] !== b[i]) diff.push(['3 · Texto curatorial', a[i] || null, b[i] || null]);
+  const rot = { nome:'1 · Denominação oficial', end:'1 · Endereço', aberto:'6 · Aberto ao público', visita:'6 · Condições de visita', agend:'6 · Agendamento', cons:'Base técnica · Nível de conservação', vistoria:'Base técnica · Data da última vistoria', acess:'Base técnica · Acessibilidade física' };
+  for (const k in rot) if ((B[k] || '') !== (m.campos[k] || '')) diff.push([rot[k], B[k] || 'não informado', m.campos[k] || 'não informado']);
+  m.diff = diff; m.editEm = HOJE; S.salvo = true;
+  if (m.status === 'publicado') m.status = 'rascunho';
+  if (enviar) { if (!diff.length) { toast('Nada mudou em relação à versão publicada.'); return; } m.status = 'revisao'; m.comentario = ''; saveMart(); toast('Enviado para revisão. Outra pessoa da curadoria publica ou devolve.'); location.hash = '#/painel/bens'; return; }
+  saveMart(); render(); toast('Rascunho salvo. A versão publicada continua no site até a revisão.');
+}
+
+/* ===== tela 9: fila de revisão ===== */
+const FILA_INFO = { 'edificio-sampaio-moreira':['Thiago Brandão','13/11/2026','v3',[['5 · Ano de construção','não informado','dado de amostra'],['2 · Par de imagens',null,'Nova foto atual (amostra)']]],
+  'theatro-municipal':['Marina Okabe','12/11/2026','v5',[['6 · Condições de visita','dado de amostra antigo','dado de amostra novo']]] };
+/* ===== novo bem ===== */
+function infoNovo(b) {
+  return [b.autor, b.em, 'v1', [['1 · Identificação', null, `${b.nome}. ${b.end}, distrito ${DNOME[b.d]}.`], ['5 · Ficha técnica', null, `${b.tip} · ${b.per}${b.est ? ' · ' + b.est : ''} · proteção: ${b.org.map(o => ORG[o].sigla).join(', ')}${b.res ? ` · ${b.res}` : ''}`]]];
+}
+S.novos.forEach(b => { BY[b.slug] = b; FILA_INFO[b.slug] = infoNovo(b); });
+const novoDe = slug => S.novos.find(b => b.slug === slug);
+function pgNovo() {
+  const v = S.novoForm || { nome:'', end:'', d:'', tip:'', per:'', est:'', org:[], res:'' }, e = S.novoErr || {};
+  const err = k => e[k] ? `<span class="ferr" id="n-${k}-err">${ic('alert')} ${e[k]}</span>` : '';
+  const inp = (k, lab, ph = '') => `<div class="field ${e[k] ? 'bad' : ''}"><label for="n-${k}">${lab} <span class="req">*</span></label><input id="n-${k}" value="${v[k].replace(/"/g, '&quot;')}" placeholder="${ph}" ${e[k] ? `aria-describedby="n-${k}-err" aria-invalid="true"` : ''}>${err(k)}</div>`;
+  const sel = (k, lab, ops, req = true) => `<div class="field ${e[k] ? 'bad' : ''}"><label for="n-${k}">${lab} ${req ? '<span class="req">*</span>' : ''}</label><select id="n-${k}" ${e[k] ? `aria-describedby="n-${k}-err" aria-invalid="true"` : ''}><option value="">Escolha</option>${ops.map(([val, t]) => `<option value="${val}" ${v[k] === val ? 'selected' : ''}>${t}</option>`).join('')}</select>${err(k)}</div>`;
+  return adm('bens', `<div class="adm-top"><div><a href="#/painel/bens" class="small">${ic('back')} Bens</a><h1>Novo bem ${modTag(1)}</h1><p>Rota: <span class="rota">/painel/bens/novo</span></p></div></div>
+  <p class="mut" style="max-width:44rem;margin:0 0 1rem">Cadastre os dados de identificação. O texto curatorial, as imagens e a linha do tempo são preenchidos depois, no editor da ficha. Como toda mudança, o bem novo só aparece no site depois de passar pela fila de revisão.</p>
+  <section class="box" style="padding:1.25rem;max-width:52rem"><div class="g2">
+    <div style="grid-column:1/-1">${inp('nome', 'Denominação oficial', 'Ex.: Edifício Esther')}</div>
+    <div style="grid-column:1/-1">${inp('end', 'Endereço completo', 'Ex.: Rua Basílio da Gama, 29')}</div>
+    ${sel('d', 'Distrito', DIST.filter(d => d[0] !== 'outros').map(d => [d[0], d[1]]))}
+    ${sel('tip', 'Tipologia', TIPS.map(t => [t, t]))}
+    ${sel('per', 'Período', PERS.map(t => [t, t]), false)}
+    ${sel('est', 'Estilo arquitetônico', ESTS.map(t => [t, t]), false)}
+    <div class="field"><label for="n-res">Resolução de tombamento</label><input id="n-res" value="${v.res.replace(/"/g, '&quot;')}" placeholder="Ex.: Conpresp, Res. 37/92"></div>
+    <fieldset class="field ${e.org ? 'bad' : ''}" style="grid-column:1/-1;border:0;padding:0;margin:0" ${e.org ? 'aria-describedby="n-org-err"' : ''}><legend style="font-weight:600;margin-bottom:.35rem">Órgãos de proteção <span class="req">*</span></legend>
+      <div style="display:flex;gap:1.25rem;flex-wrap:wrap">${Object.entries(ORG).map(([k, o]) => `<label class="chk"><input type="checkbox" data-norg="${k}" ${v.org.includes(k) ? 'checked' : ''}> ${o.sigla} <span class="mut small">(${o.inst})</span></label>`).join('')}</div>${err('org')}</fieldset>
+  </div>
+  <p class="small mut" style="margin:1rem 0 0">${ic('locate')} O ponto no mapa sai do endereço (geocodificação) e pode ser ajustado no editor.</p>
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.25rem"><button class="btn pri" data-act="novo-enviar">Enviar para revisão</button><button class="btn" data-act="novo-salvar">Salvar rascunho</button><a class="btn ghost" href="#/painel/bens">Cancelar</a></div></section>`);
+}
+function criarBem(enviar) {
+  const g = id => ($('#n-' + id).value || '').trim();
+  const v = { nome:g('nome'), end:g('end'), d:g('d'), tip:g('tip'), per:g('per'), est:g('est'), res:g('res'), org:$$('[data-norg]').filter(x => x.checked).map(x => x.dataset.norg) };
+  const e = {}, base = norm(v.nome).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  if (!v.nome) e.nome = 'Informe a denominação oficial.';
+  else if (Object.values(BY).some(b => norm(b.nome) === norm(v.nome))) e.nome = 'Já existe um bem com esse nome. Abra o existente em Bens para editá-lo.';
+  if (!v.end) e.end = 'Informe o endereço.';
+  if (!v.d) e.d = 'Escolha o distrito.';
+  if (!v.tip) e.tip = 'Escolha a tipologia.';
+  if (!v.org.length) e.org = 'Marque ao menos um órgão de proteção.';
+  S.novoForm = v; S.novoErr = e;
+  if (Object.keys(e).length) { render(); const f = $('[aria-invalid="true"]') || $('[data-norg]'); if (f) f.focus(); return; }
+  let slug = base || 'bem', i = 2; while (BY[slug]) slug = `${base}-${i++}`;
+  const b = { ...v, slug, per:v.per || 'não informado', named:true, novo:true, ficha:'base', cons:null, st:enviar ? 'revisao' : 'rascunho', autor:QUEM[S.role][0], em:HOJE };
+  S.novos.push(b); BY[slug] = b; FILA_INFO[slug] = infoNovo(b);
+  if (enviar) S.fila.push(slug);
+  store.set('ep-novos', S.novos); saveMart(); S.novoForm = null; S.novoErr = null;
+  toast(enviar ? `${b.nome} foi para a fila de revisão. Outra pessoa da curadoria publica.` : `${b.nome} salvo como rascunho.`);
+  location.hash = '#/painel/bens';
+}
+function pgRevisao() {
+  const itens = [...(S.mart.status === 'revisao' ? ['edificio-martinelli'] : []), ...S.fila];
+  if (!itens.includes(S.revSel)) S.revSel = itens[0] || null;
+  const sel = S.revSel, info = sel === 'edificio-martinelli' ? ['Marina Okabe', S.mart.editEm || HOJE, 'v' + (S.mart.ver + 1), S.mart.diff || []] : FILA_INFO[sel];
+  const meu = !!info && info[0] === QUEM[S.role][0];
+  const cel = (x, c, l) => x == null ? '' : `<p style="margin:.2rem 0"><span class="dl">${l}</span><span class="${c}">${x}</span></p>`;
+  return adm('revisao', `<div class="adm-top"><div><h1>Fila de revisão ${modTag(1)}</h1><p>${itens.length ? `${itens.length} ${itens.length > 1 ? 'versões esperam' : 'versão espera'} sua decisão. Rota: <span class="rota">/painel/revisao</span>` : 'Nada esperando revisão.'}</p></div></div>
+  ${itens.length ? `<div class="rev"><ul class="revlist box" aria-label="Versões em revisão">${itens.map(s => { const i = s === 'edificio-martinelli' ? ['Marina Okabe', S.mart.editEm || HOJE, 'v' + (S.mart.ver + 1)] : FILA_INFO[s];
+    return `<li><button data-rev="${s}" class="${s === sel ? 'on' : ''}" aria-current="${s === sel}"><b>${BY[s].nome}</b><span class="small mut">${i[2]} · enviada por ${i[0]} em ${i[1]}</span>${novoDe(s) ? '<span class="small mut">bem novo</span>' : s !== 'edificio-martinelli' ? '<span class="small mut">amostra</span>' : ''}</button></li>`; }).join('')}</ul>
+  <div class="box"><div style="padding:1rem 1.25rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:flex-start"><div><h2 style="font-size:1.25rem">${BY[sel].nome}, ${info[2]}</h2><p class="small mut" style="margin:.25rem 0 0">Enviada por ${info[0]} em ${info[1]}. ${novoDe(sel) ? 'Bem novo: ainda não tem versão publicada. Abaixo, os dados do cadastro.' : 'Abaixo, só o que mudou em relação à versão publicada.'}</p></div>${sel === 'edificio-martinelli' ? `<button class="btn sm" data-act="prev-rev">${ic('eye')} Prévia da ficha</button>` : ''}</div>
+    ${info[3].map(([bl, a, b]) => `<div class="diff"><h3>${bl.startsWith('Base técnica') ? `${bl} <span class="tag tec">não aparece no site</span>` : 'Bloco ' + bl}</h3>${cel(a, 'del', 'Antes')}${cel(b, 'add', a == null ? 'Novo' : 'Depois')}</div>`).join('') || '<div class="diff mut">Sem mudanças registradas.</div>'}
+    <div class="diff"><div class="field ${S.erroCom ? 'bad' : ''}" style="max-width:40rem"><label for="com">Comentário para quem editou <span class="mut" style="font-weight:400">(obrigatório para devolver)</span></label><textarea id="com" rows="3" aria-describedby="com-err">${S.com || ''}</textarea>${S.erroCom ? `<span class="ferr" id="com-err">${ic('alert')} Escreva o que precisa mudar antes de devolver.</span>` : ''}</div>
+    ${meu ? `<p class="ex-banner">${ic('alert')}<span>Você enviou esta versão. Quem publica ou devolve é outra pessoa da curadoria (ou a administração).</span></p>` : ''}
+    <div style="display:flex;gap:.5rem"><button class="btn pri" data-act="publicar" ${meu ? 'disabled' : ''}>${ic('check')} Publicar</button><button class="btn" data-act="devolver" ${meu ? 'disabled' : ''}>Devolver com comentário</button></div></div></div></div>` : `<div class="box" style="padding:2rem;max-width:40rem"><p style="margin:0">Quando alguém enviar uma ficha para revisão, ela aparece aqui com as mudanças destacadas.</p></div>`}`);
+}
+function decidir(publica) {
+  const sel = S.revSel, com = ($('#com').value || '').trim();
+  if (!publica && !com) { S.erroCom = true; S.com = ''; render(); $('#com').focus(); return; }
+  S.erroCom = false; S.com = '';
+  if (sel === 'edificio-martinelli') {
+    if (publica) { const m = S.mart; m.ver++; m.status = 'publicado'; m.pubEm = HOJE; m.pubPor = QUEM[S.role][0]; if (m.novaImg && !m.fotos.includes('martAt2')) m.fotos.push('martAt2'); m.textoPub = m.texto; m.vistoriaPub = m.campos ? m.campos.vistoria : null; m.pubCampos = m.campos || null; m.novaImg = false; m.diff = []; aplicaPub();
+      toast(`Publicado. A versão ${m.ver} do Edifício Martinelli já está no site.`); }
+    else { S.mart.status = 'rascunho'; S.mart.comentario = com; S.mart.devPor = QUEM[S.role][0]; toast('Devolvido para quem enviou, com o seu comentário.'); }
+  } else if (novoDe(sel)) { const b = novoDe(sel); S.fila = S.fila.filter(s => s !== sel); b.st = publica ? 'publicado' : 'rascunho'; store.set('ep-novos', S.novos);
+    toast(publica ? `Publicado: ${b.nome}. No protótipo o mapa segue com os 2.500 bens de amostra; no sistema, o bem entra no mapa na hora.` : `Devolvido: ${b.nome}, com o seu comentário.`); }
+  else { S.fila = S.fila.filter(s => s !== sel); if (!publica) S.devolvidos++; store.set('ep-dev', S.devolvidos); toast(publica ? `Publicado: ${BY[sel].nome}.` : `Devolvido: ${BY[sel].nome}.`); }
+  saveMart(); render();
+}
+
+/* ===== taxonomia: nomes atuais por posição (os novos vão para o fim) ===== */
+S.tax = store.get('ep-tax', { tip:[...TIPS], per:[...PERS] }); if (!S.tax.est) S.tax.est = [...ESTS];
+const TAXL = { tip:{ arr:TIPS, nome:'tipologia', nova:'Nova tipologia', col:'Tipologia' }, per:{ arr:PERS, nome:'faixa de período', nova:'Nova faixa', col:'Período de construção' }, est:{ arr:ESTS, nome:'estilo', nova:'Novo estilo', col:'Estilo arquitetônico' } };
+function aplicaTax() {
+  Object.entries(TAXL).forEach(([k, { arr }]) => {
+    const mapa = {}; arr.forEach((v, i) => { if (S.tax[k][i] !== v) mapa[v] = S.tax[k][i]; });
+    if (Object.keys(mapa).length) { BENS.forEach(b => { if (mapa[b[k]]) b[k] = mapa[b[k]]; }); if (mapa[S.f[k]]) S.f[k] = mapa[S.f[k]]; if (k === 'tip') S.tipOff = S.tipOff.map(x => mapa[x] || x); }
+    arr.splice(0, arr.length, ...S.tax[k]);
+  });
+  store.set('ep-tax', S.tax);
+}
+aplicaTax();
+const ea = s => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+const slugDe = (nome, atual) => { const base = norm(nome).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'roteiro'; let s = base, i = 2; while (ROTEIROS.some(r => r.slug === s && r.slug !== atual)) s = `${base}-${i++}`; return s; };
+function buscaParada(v) {
+  const nq = x => norm(x).replace(/th/g, 't'), r = ROTEIROS[S.rotSel], q = nq(v.trim()), ul = $('#r-res'), inp = $('#r-busca');
+  const ok = NAMED.filter(b => !r.paradas.some(p => p[0] === b.slug) && (!q || nq(b.nome).includes(q) || nq(b.end).includes(q))).slice(0, 8);
+  ul.innerHTML = ok.map(b => `<li><button role="option" data-act="rot-add" data-slug="${b.slug}"><b>${b.nome}</b><span class="small mut">${b.end} · ${DNOME[b.d]}</span></button></li>`).join('') || `<li class="vazio">${q ? 'Nenhum bem com ficha encontrado.' : 'Todos os bens com ficha já estão no roteiro.'}</li>`;
+  ul.hidden = false; inp.setAttribute('aria-expanded', 'true');
+}
+function dlgTax(k, i) {
+  S.taxDlg = { k, i }; const nome = i < 0 ? '' : S.tax[k][i], q = i < 0 ? 0 : cnt(BENS, b => b[k] === nome), tipo = TAXL[k].nome, nova = k === 'est' ? 'Novo ' : 'Nova ';
+  dlg(`<div class="dlg-h"><b>${i < 0 ? nova + tipo : 'Editar ' + tipo}</b><button class="btn sm ghost" data-act="fecharDlg" aria-label="Fechar">${ic('x')}</button></div>
+  <div style="padding:1.25rem;min-width:min(26rem,80vw)"><div class="field" id="tax-f"><label for="tax-nome">Nome</label><input id="tax-nome" value="${ea(nome)}" aria-describedby="tax-err" onkeydown="if(event.key==='Enter'){event.preventDefault();document.querySelector('[data-act=tax-ok]').click()}"><span class="ferr" id="tax-err"></span></div>
+  <p class="small mut" style="margin:.5rem 0 1rem">${i < 0 ? `${k === 'est' ? 'O estilo novo' : `A ${tipo} nova`} começa sem bens e aparece no filtro do mapa.` : `Os ${fmt(q)} bens com ${k === 'est' ? 'este' : 'esta'} ${tipo} passam a usar o novo nome, e o filtro do mapa também.`}</p>
+  <div style="display:flex;gap:.5rem;justify-content:flex-end"><button class="btn" data-act="fecharDlg">Cancelar</button><button class="btn pri" data-act="tax-ok">Salvar</button></div></div>`);
+  const inp = $('#tax-nome'); inp.focus(); inp.select();
+}
+function taxOk() {
+  const { k, i } = S.taxDlg, v = $('#tax-nome').value.trim(), tipo = TAXL[k].nome;
+  const erro = !v ? 'Informe o nome.' : S.tax[k].some((x, j) => j !== i && norm(x) === norm(v)) ? `Já existe ${k === 'est' ? 'um' : 'uma'} ${tipo} com esse nome.` : '';
+  if (erro) { $('#tax-f').classList.add('bad'); $('#tax-err').innerHTML = `${ic('alert')} ${erro}`; $('#tax-nome').focus(); return; }
+  const antes = i < 0 ? null : S.tax[k][i];
+  if (i < 0) S.tax[k].push(v); else S.tax[k][i] = v;
+  aplicaTax(); $('#dlg').close(); render(); toast(antes ? `"${antes}" agora se chama "${v}".` : `"${v}" ${k === 'est' ? 'criado' : 'criada'}.`);
+}
+/* ===== tela 10: taxonomia e filtros ===== */
+function pgTax() {
+  const tab = S.taxTab, tabs = [['tip','Tipologias'],['per','Períodos'],['est','Estilos arquitetônicos'],['cons','Escala de conservação (base técnica)'],['rot','Roteiros']];
+  let body = '';
+  if (TAXL[tab]) { const lista = TAXL[tab].arr, k = tab;
+    body = `<table class="t"><thead><tr><th>${TAXL[tab].col}</th><th>Bens</th><th>Aparece no filtro do mapa</th><th></th></tr></thead><tbody>${lista.map((t, ix) => `<tr><td>${t}</td><td>${fmt(cnt(BENS, b => b[k] === t))}</td><td><label class="chk"><input type="checkbox" ${tab !== 'tip' || !S.tipOff.includes(t) ? 'checked' : ''} ${tab === 'tip' ? `data-tipoff="${t}"` : 'disabled'}> ${tab === 'tip' ? (S.tipOff.includes(t) ? 'Não' : 'Sim') : 'Sim'}</label></td><td><button class="btn sm" data-act="tax-edit" data-k="${k}" data-i="${ix}">Editar</button></td></tr>`).join('')}
+    <tr><td><b>Total</b></td><td><b>${fmt(lista.reduce((a, t) => a + cnt(BENS, b => b[k] === t), 0))}</b></td><td colspan="2"></td></tr></tbody></table><div style="padding:.75rem"><button class="btn sm" data-act="tax-novo" data-k="${k}">${ic('plus')} ${TAXL[tab].nova}</button></div>`; }
+  if (tab === 'cons') body = `<table class="t"><thead><tr><th>Nível</th><th>Cor</th><th>Critério objetivo</th><th>Bens</th></tr></thead><tbody>${[1, 2, 3, 4, 5].map(k => `<tr><td>${consHTML(k)}</td><td><span class="sw" style="background:var(--c${k})"></span></td><td>${CONS[k].crit}</td><td>${fmt(cnt(BENS, b => b.cons === k))}</td></tr>`).join('')}<tr><td colspan="3"><b>Total</b></td><td><b>${fmt(BENS.length)}</b></td></tr></tbody></table><p class="small mut" style="padding:.75rem;margin:0">Critério proposto pela equipe, a validar com a curadoria. O rótulo e o número sempre acompanham a cor. A escala é da base técnica: aparece só no painel, não no site.</p>`;
+  if (tab === 'rot') { if (!(S.rotSel < ROTEIROS.length)) S.rotSel = 0; const r = ROTEIROS[S.rotSel];
+    const lista = `<div><ul class="revlist box" aria-label="Roteiros">${ROTEIROS.map((x, i) => `<li><button data-act="rot-sel" data-i="${i}" class="${i === S.rotSel ? 'on' : ''}" aria-current="${i === S.rotSel}"><b class="rnm">${ea(x.nome)}</b><span class="small mut">${x.paradas.length} ${x.paradas.length === 1 ? 'parada' : 'paradas'} · ${x.st === 'publicado' ? 'Publicado' : 'Rascunho'}</span></button></li>`).join('')}</ul>
+      <button class="btn" data-act="rot-novo" style="margin-top:.75rem;width:100%">${ic('plus')} Novo roteiro</button></div>`;
+    let ed = `<div class="box roted"><p class="mut" style="margin:0">Nenhum roteiro. Use "Novo roteiro" para criar o primeiro.</p></div>`;
+    if (r) { const st = r.paradas, est = st.length > 1 ? rotStats(r) : null;
+      ed = `<div class="box roted"><div class="roted-top"><div><h2><span class="rnm">${ea(r.nome)}</span> <span class="st ${r.st === 'publicado' ? 'pub' : 'ras'}"><i></i>${r.st === 'publicado' ? 'Publicado' : 'Rascunho'}</span></h2>
+        <p class="small mut" style="margin:.25rem 0 0">${r.st === 'publicado' ? `No site em <span class="rota">/roteiros/${r.slug}/</span>. As mudanças valem na hora.` : 'Ainda não aparece no site. Publique quando tiver ao menos 2 paradas.'} Tudo é salvo automaticamente.</p></div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">${r.st === 'publicado' ? `<button class="btn sm" data-act="rot-ver" data-slug="${r.slug}">${ic('eye')} Ver no site</button>` : ''}<button class="btn sm ${r.st === 'publicado' ? '' : 'pri'}" data-act="rot-pub">${r.st === 'publicado' ? 'Despublicar' : `${ic('check')} Publicar`}</button><button class="btn sm" data-act="rot-del">${ic('x')} Excluir</button></div></div>
+      <div class="g2"><div class="field" style="grid-column:1/-1"><label for="r-nome">Nome do roteiro <span class="req">*</span></label><input id="r-nome" data-rf="nome" value="${ea(r.nome)}"></div>
+        <div class="field" style="grid-column:1/-1"><label for="r-resumo">Resumo <span class="mut" style="font-weight:400">(aparece no cartão da lista de roteiros)</span></label><input id="r-resumo" data-rf="resumo" value="${ea(r.resumo)}"></div>
+        <div class="field" style="grid-column:1/-1"><label for="r-apres">Apresentação</label><textarea id="r-apres" data-rf="apres" rows="3">${ea(r.apres)}</textarea></div></div>
+      <h3 style="font-size:1.05rem;margin:1.25rem 0 .25rem">Paradas (${st.length})</h3><p class="small mut" style="margin:0">${est ? `Cerca de ${est.km} km, uns ${est.min} minutos a pé. ` : ''}A página pública e o mapa do percurso seguem esta ordem.</p>
+      <div class="addp"><label for="r-busca" class="sr">Adicionar parada</label><span class="addp-in">${ic('search')}<input id="r-busca" type="search" autocomplete="off" placeholder="Adicionar parada: busque um bem pelo nome ou endereço" aria-controls="r-res" aria-expanded="false"></span><ul class="addp-res" id="r-res" role="listbox" aria-label="Bens para adicionar" hidden></ul></div>
+      <ol class="paradas">${st.map(([s, txt], i) => `<li><span class="nn">${i + 1}</span><div><div style="display:flex;justify-content:space-between;gap:1rem;align-items:center"><span><b>${BY[s].nome}</b><br><span class="small mut">${BY[s].end}</span></span><span style="display:flex;gap:.25rem;flex:none"><button class="btn sm" data-mv="${i}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="Subir ${BY[s].nome}">${ic('up')}</button><button class="btn sm" data-mv="${i}" data-d="1" ${i === st.length - 1 ? 'disabled' : ''} aria-label="Descer ${BY[s].nome}">${ic('down')}</button><button class="btn sm" data-act="rot-rm" data-i="${i}" aria-label="Remover ${BY[s].nome} do roteiro">Remover</button></span></div>
+        <label class="sr" for="pt${i}">Texto da parada ${i + 1}</label><textarea id="pt${i}" data-pt="${i}" rows="2" placeholder="O que contar nesta parada">${ea(txt)}</textarea></div></li>`).join('') || '<li style="display:block" class="mut">Nenhuma parada ainda.</li>'}</ol></div>`; }
+    body = `<div class="rev">${lista}${ed}</div>`; }
+  return adm('taxonomia', `<div class="adm-top"><div><h1>Taxonomia e filtros ${modTag(1)}</h1><p>Define o que aparece nos filtros do mapa e nos roteiros. Rota: <span class="rota">/painel/taxonomia</span></p></div></div>
+  <div class="tabs" role="tablist">${tabs.map(([k, t]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${t}${k === 'rot' ? modMn(3) : ''}</button>`).join('')}</div>${tab === 'rot' ? body : `<div class="box">${body}</div>`}`);
+}
+
+/* ===== patrocínio (só administração) ===== */
+function pgPat() {
+  const P = S.patForm || S.pat, er = S.patErr || {}, e = x => String(x || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const inp = (k, lab, dica) => `<div class="field ${er[k] ? 'bad' : ''}"><label for="pt-${k}">${lab} <span class="req">*</span></label><input id="pt-${k}" data-pat="${k}" value="${e(P[k])}" ${er[k] ? `aria-invalid="true" aria-describedby="pt-${k}-err"` : ''}>${er[k] ? `<span class="ferr" id="pt-${k}-err">${ic('alert')} ${er[k]}</span>` : `<span class="small mut">${dica}</span>`}</div>`;
+  return adm('patrocinio', `<div class="adm-top"><div><h1>Patrocínio ${modTag(1)}</h1><p>A marca do patrocinador num bloco próprio: trocar aqui muda o Sobre, a capa, a legenda do mapa e os rodapés, sem mexer no resto do site. Rota: <span class="rota">/painel/patrocinio</span></p></div></div>
+  <div class="g2" style="max-width:64rem;align-items:start"><section class="box" style="padding:1.25rem">
+    <label class="chk" style="margin-bottom:1rem"><input type="checkbox" data-pat="exibir" ${P.exibir ? 'checked' : ''}> Exibir o patrocínio no site</label>
+    ${inp('nome', 'Nome do patrocinador', 'Aparece no Sobre.')}
+    ${inp('marca', 'Marca', 'No protótipo, um texto no selo. No sistema, o envio do logo em SVG ou PNG.')}
+    ${inp('link', 'Link', 'Endereço completo, começando com https://')}
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap"><button class="btn pri" data-act="pat-salvar">Salvar</button><button class="btn" data-act="pat-padrao">Voltar ao padrão</button></div>
+    <p class="small mut" style="margin:1rem 0 0">Não passa pela fila de revisão: só a administração mexe no patrocínio.</p></section>
+  <section class="box" style="padding:1.25rem"><h2 style="font-size:1rem;margin-bottom:.75rem">Prévia no Sobre</h2><div id="pat-prev">${patHTML('sobre', P)}</div>
+    <h2 style="font-size:1rem;margin:1.25rem 0 .75rem">Prévia do selo nas outras telas</h2><div id="pat-prev2">${patHTML('', P) || '<span class="small mut">O selo fica oculto.</span>'}</div></section></div>`);
+}
+const patLer = () => ({ exibir:$('[data-pat="exibir"]').checked, nome:$('#pt-nome').value.trim(), marca:$('#pt-marca').value.trim(), link:$('#pt-link').value.trim() });
+function patSalvar() {
+  const P = patLer(), er = {};
+  if (!P.nome) er.nome = 'Informe o nome do patrocinador.';
+  if (!P.marca) er.marca = 'Informe o texto da marca.';
+  if (!linkOk(P.link)) er.link = 'Use um endereço completo e seguro, como https://www.example.org';
+  S.patForm = P; S.patErr = er;
+  if (Object.keys(er).length) { render(); const f = $('[aria-invalid="true"]'); if (f) f.focus(); return; }
+  S.pat = P; store.set('ep-pat', P); S.patForm = null; S.patErr = null; render(); toast('Patrocínio atualizado. A mudança já vale no Sobre, na capa, no mapa e nos rodapés.');
+}
+
+/* ===== página de módulos (capa, sem perfil) ===== */
+function pgModulos() {
+  const ver = (role, h, extra = '') => `<button class="btn sm" data-act="mod-ir" data-r="${role}" data-h="${h}" ${extra}>Ver ${ic('arrow')}</button>`;
+  const item = (txt, b = '') => `<li><span>${txt}</span> ${b}</li>`;
+  return `<div class="wrap" style="max-width:56rem"><p style="margin:1.25rem 0 0"><a href="#/perfil" class="small">${ic('back')} Escolha de perfil</a></p>
+  <h1 style="font-size:clamp(1.9rem,4vw,2.5rem);margin:1rem 0 .5rem">Como o projeto se divide</h1>
+  <p class="prose" style="margin:0 0 1rem">O projeto pode ser contratado por módulos. O módulo 1 já põe o site no ar e funciona sozinho. Os módulos 2 e 3 se apoiam nele e podem vir depois, sem refazer o que foi entregue. Cada tela do protótipo traz a etiqueta do módulo a que pertence.</p>
+  <ul class="mods">
+  <li><span class="tag mod">Módulo 1</span><h2>${MODN[1]}</h2><p class="mut" style="margin:0">O mapa com todos os bens, a ficha de cada um e o painel para a equipe cadastrar, revisar e publicar.</p><ul>
+    ${item('Mapa com agrupamento e contagem; busca por bem, endereço ou arquiteto; filtros por instância, tipologia, período, estilo arquitetônico e distrito; "Perto de mim". Painel lateral no computador e gaveta no celular.', ver('visitante', '#/'))}
+    ${item('Ficha do bem: identificação, "Na época e hoje" com comparador, texto curatorial, linha do tempo, ficha técnica, visitação, localização, referências e compartilhamento.', ver('visitante', '#/bem/edificio-martinelli/'))}
+    ${item('Página Sobre, com o bloco de patrocínio.', ver('visitante', '#/sobre/'))}
+    ${item('Painel da curadoria: lista de bens, cadastro de bem novo, editor da ficha com a aba Base técnica (conservação e acessibilidade) e fila de revisão por pares.', ver('curador', '#/painel/bens/edificio-martinelli'))}
+    ${item('Painel da administração: taxonomia e filtros (tipologias, períodos, estilos e escala de conservação), patrocínio, usuários e perfis.', ver('admin', '#/painel/taxonomia'))}</ul></li>
+  <li><span class="tag mod">Módulo 2</span><h2>${MODN[2]}</h2><p class="mut" style="margin:0">Os bens também por lugar, fora do mapa, em páginas próprias que aparecem na busca do Google.</p><ul>
+    ${item('Lista de distritos e página de cada distrito, com indicadores por órgão, tipologia e estilo, e a lista ordenável.', ver('visitante', '#/distrito/se/'))}
+    ${item('Página de logradouro e o caminho Cidade › Distrito › Logradouro › Bem.', ver('visitante', '#/logradouro/rua-sao-bento/'))}
+    ${item('Páginas de órgão, de tipologia e de estilo, no mesmo modelo do distrito. <span class="small mut">Sem tela no protótipo.</span>')}
+    ${item('Importar e exportar planilha (CSV e GeoJSON) no painel.', ver('admin', '#/painel/bens'))}</ul></li>
+  <li><span class="tag mod">Módulo 3</span><h2>${MODN[3]}</h2><p class="mut" style="margin:0">Percursos pela cidade e o site em outros idiomas.</p><ul>
+    ${item('Roteiros: lista, página com o mapa do percurso e editor de roteiros na administração.', ver('visitante', '#/roteiros/'))}
+    ${item('Interface em inglês e espanhol. A tradução dos textos curatoriais é da curadoria.', ver('visitante', '#/bem/edificio-martinelli/', 'data-l="en"'))}</ul></li></ul>
+  <p class="small mut" style="border-top:1px solid var(--line);padding-top:1rem">Prazo e valor de cada módulo estão na proposta.</p></div>`;
+}
+
+/* ===== tela 11: usuários e perfis ===== */
+function pgUsuarios() {
+  const perm = [['Editar fichas e imagens',1,1],['Enviar para revisão',1,1],['Publicar ou devolver a versão de outra pessoa',1,1],['Importar e exportar a base',1,1],['Taxonomia, filtros e roteiros',0,1],['Gerenciar a equipe e os acessos',0,1]];
+  return adm('usuarios', `<div class="adm-top"><div><h1>Usuários e perfis ${modTag(1)}</h1><p>Quem da equipe acessa o painel. Rota: <span class="rota">/painel/usuarios</span></p></div><button class="btn pri" data-act="convidar">${ic('plus')} Convidar pessoa da equipe</button></div>
+  <div class="box"><table class="t"><thead><tr><th>Nome</th><th>Papel</th><th>Último acesso</th><th></th></tr></thead><tbody>${EQUIPE.map(([n, p, u], i) => `<tr><td><b>${n}</b>${i === 0 ? ' <span class="small mut">(você)</span>' : ''}</td><td><label class="sr" for="pp${i}">Papel de ${n}</label><select id="pp${i}" ${i === 0 ? 'disabled' : ''} data-act-change="papel">${['Administrador(a)','Curador(a)'].map(x => `<option ${x.slice(0, 5) === p.slice(0, 5) ? 'selected' : ''}>${x}</option>`).join('')}</select></td><td>${u}</td><td>${i === 0 ? '' : '<button class="btn sm" data-act="simul">Remover acesso</button>'}</td></tr>`).join('')}</tbody></table></div>
+  <h2 style="font-size:1.1rem;margin:1.5rem 0 .5rem">O que cada papel pode fazer</h2>
+  <div class="box" style="max-width:52rem"><table class="t"><thead><tr><th>Ação</th><th>Curador(a)</th><th>Administrador(a)</th></tr></thead><tbody>${perm.map(([a, ...v]) => `<tr><td>${a}</td>${v.map(x => `<td>${x ? `<span class="st pub">${ic('check')} Sim</span>` : '<span class="mut">Não</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+  <div class="lgpd">${ic('check')}<div><b>Dados pessoais</b><p style="margin:.25rem 0 0">${CONTA_VISITANTE ? 'Navegar não exige conta. Quem cria a conta opcional de visitante (sugestão, fora do TR) guarda só nome, e-mail e a lista de bens salvos, e pode baixar os dados ou excluir a conta quando quiser.' : 'O visitante não cria conta, então o site não guarda dados pessoais do público.'} Da equipe, o sistema guarda nome e e-mail das ${EQUIPE.length} pessoas, só para o acesso ao painel.</p></div></div>`);
+}
+
+/* ===== diálogos ===== */
+function dlg(html) { const d = $('#dlg'); d.innerHTML = html; if (!d.open) d.showModal(); }
+function dlgImport() {
+  const s = S.imp, passos = ['Arquivo','Colunas','Conferência'];
+  const cab = `<div class="dlg-h"><h2 style="font-size:1.15rem">Importar planilha</h2><button class="btn sm ghost" data-act="fecharDlg" aria-label="Fechar">${ic('x')}</button></div><div class="dlg-b"><p class="steps">${passos.map((p, i) => i + 1 === s ? `<b>${i + 1}. ${p}</b>` : `${i + 1}. ${p}`).join(' › ')}</p>`;
+  if (s === 1) return dlg(cab + `<div class="drop">${ic('upload')}<p style="margin:.5rem 0">Arraste a planilha (CSV ou XLSX) ou clique para escolher.</p><button class="btn pri" data-act="imp2">Usar o arquivo de exemplo: planilha-curadoria-exemplo.csv</button></div><p class="small mut">A planilha serve para cadastrar e corrigir bens em lote, a partir das listas que a curadoria já organiza.</p></div>`);
+  if (s === 2) return dlg(cab + `<table class="t"><thead><tr><th>Coluna da planilha</th><th>Campo da ficha</th></tr></thead><tbody>${[['nm_bem','Denominação oficial'],['tx_endereco','Endereço completo'],['nm_distrito','Distrito'],['sg_orgao','Órgão de tombamento'],['nr_resolucao','Resolução'],['nr_processo','Número do processo'],['cd_x / cd_y','Coordenadas']].map(([a, b]) => `<tr><td><code>${a}</code></td><td>${b}</td></tr>`).join('')}</tbody></table><p class="small mut">Nomes de coluna ilustrativos; a curadoria escolhe o modelo da planilha.</p></div><div class="dlg-f"><button class="btn" data-act="imp1">Voltar</button><button class="btn pri" data-act="imp3">Conferir dados</button></div>`);
+  dlg(cab + `<dl class="ft" style="grid-template-columns:1fr"><div><dt>Linhas lidas</dt><dd>2.618</dd></div><div><dt>Linhas do mesmo bem em mais de um órgão, unidas</dt><dd>118</dd></div><div><dt>Bens depois da união</dt><dd><b>2.500</b></dd></div><div><dt>Com coordenada válida</dt><dd>2.431</dd></div><div><dt>Sem coordenada (vão para geocodificação, com conferência manual)</dt><dd>69</dd></div><div><dt>Erros de formato</dt><dd>0</dd></div></dl></div>
+  <div class="dlg-f"><button class="btn" data-act="imp2">Voltar</button><button class="btn pri" data-act="impOk">Importar 2.500 bens</button></div>`);
+}
+function baixar(nome, txt, tipo) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type:tipo })); a.download = nome; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }
+function exportar() {
+  baixar('bens-tombados-amostra.csv', '﻿nome;distrito;orgaos;tipologia;periodo;estilo;conservacao;lat;lng\n' + BENS.map(b => [b.nome, DNOME[b.d], b.org.map(o => ORG[o].sigla).join(' + '), b.tip, b.per, b.est, b.cons, b.lat.toFixed(6), b.lng.toFixed(6)].join(';')).join('\n'), 'text/csv');
+  toast(`Exportados ${fmt(BENS.length)} bens (dados de amostra).`);
+}
+
+/* ================= roteador ================= */
+const HOME = { visitante:'#/', membro:'#/', curador:'#/painel/bens', admin:'#/painel/bens' };
+const ROUTES = [
+  [/^#\/$/, ['visitante','membro'], () => pgMapa(), 'mapa'],
+  [/^#\/bem\/([a-z0-9-]+)\/$/, ['visitante','membro'], m => pgBem(m[1]), 'bem'],
+  [/^#\/distritos\/$/, ['visitante','membro'], () => pgDistritos()],
+  [/^#\/distrito\/([a-z0-9-]+)\/$/, ['visitante','membro'], m => pgDistrito(m[1]), 'distrito'],
+  [/^#\/logradouro\/([a-z0-9-]+)\/$/, ['visitante','membro'], m => pgLogradouro(m[1])],
+  [/^#\/roteiros\/$/, ['visitante','membro'], () => pgRoteiros()],
+  [/^#\/roteiros\/([a-z0-9-]+)\/$/, ['visitante','membro'], m => pgRoteiro(m[1]), 'roteiro'],
+  [/^#\/sobre\/$/, ['visitante','membro'], () => pgSobre()],
+  [/^#\/painel\/bens$/, ['curador','admin'], () => pgBens()],
+  [/^#\/painel\/bens\/novo$/, ['curador','admin'], () => pgNovo()],
+  [/^#\/painel\/bens\/edificio-martinelli$/, ['curador','admin'], () => pgEditor()],
+  [/^#\/painel\/revisao$/, ['curador','admin'], () => pgRevisao()],
+  [/^#\/minha-conta\/$/, ['membro'], () => pgConta()],
+  [/^#\/painel\/taxonomia$/, ['admin'], () => pgTax()],
+  [/^#\/painel\/usuarios$/, ['admin'], () => pgUsuarios()],
+  [/^#\/painel\/patrocinio$/, ['admin'], () => pgPat()]
+];
+let ultimaRota = '';
+function render() {
+  minis.forEach(m => m.remove()); minis = [];
+  if (S.role && !HOME[S.role]) S.role = null;
+  if (S.role === 'membro' && !CONTA_VISITANTE) S.role = 'visitante'; // perfil salvo de uma versão antiga do protótipo
+  let h = location.hash || '#/'; if (h === '#') h = '#/';
+  const path = h.replace(/\?.*$/, '');
+  if (path === '#/modulos') { document.body.className = ''; $('#mapWrap').hidden = true; $('#hdr').innerHTML = ''; $('#page').innerHTML = pgModulos(); document.title = 'Como o projeto se divide · Encontro com o Patrimônio'; scrollTo(0, 0); ultimaRota = path; return; }
+  if (!S.role || path === '#/perfil') { document.body.className = ''; $('#mapWrap').hidden = true; $('#hdr').innerHTML = ''; $('#page').innerHTML = pgCapa(); document.title = 'Encontro com o Patrimônio · protótipo'; return; }
+  const r = ROUTES.find(x => x[0].test(path));
+  if (!r || !r[1].includes(S.role)) { location.replace(HOME[S.role]); return; }
+  const m = path.match(r[0]), mudou = path !== ultimaRota; ultimaRota = path;
+  if (mudou && path === '#/painel/revisao') S.revSel = null; // ao chegar na fila, abre o envio mais recente
+  if (r[3] === 'mapa') {
+    document.body.className = 'mode-map'; $('#hdr').innerHTML = hdr('mapa'); $('#page').innerHTML = ''; $('#mapWrap').hidden = false;
+    if (mudou) filtrosDaURL(); pgMapa(); document.title = 'Mapa dos bens tombados · Encontro com o Patrimônio';
+  } else {
+    document.body.className = ''; $('#mapWrap').hidden = true; $('#hdr').innerHTML = '';
+    $('#page').innerHTML = r[2](m);
+    if (r[3] === 'bem') posBem(m[1]); if (r[3] === 'distrito') posDistrito(m[1]); if (r[3] === 'roteiro') posRoteiro(m[1]);
+    const h1 = $('#page h1'); document.title = (h1 ? h1.textContent.replace(/\s*Módulo \d\s*$/, '').trim() + ' · ' : '') + 'Encontro com o Patrimônio';
+    if (mudou) scrollTo(0, 0);
+  }
+}
+addEventListener('hashchange', render);
+
+/* ================= eventos ================= */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act],[data-role],[data-res],[data-lang],[data-cmp],[data-pag],[data-rev],[data-tab],[data-edtab],[data-mv],[data-prev],[data-goto],[data-cmd]'); if (!t) { if (!e.target.closest('.search') && $('#sres')) $('#sres').hidden = true; if (!e.target.closest('.addp') && $('#r-res')) $('#r-res').hidden = true; if (e.target.id === 'r-busca') buscaParada(e.target.value); return; }
+  const d = t.dataset, a = d.act;
+  if (d.role) { S.role = d.role; store.set('ep-role', S.role); S.sel = null; location.hash = HOME[S.role]; if (location.hash === HOME[S.role]) render(); return; }
+  if (d.res) return escolhe(+d.res);
+  if (d.lang) { S.lang = d.lang; return render(); }
+  if (d.cmp) { S.cmp = d.cmp; return render(); }
+  if (d.pag) { S.distPag = +d.pag; render(); return scrollTo(0, 0); }
+  if (d.rev) { S.revSel = d.rev; S.erroCom = false; return render(); }
+  if (d.tab) { S.taxTab = d.tab; return render(); }
+  if (d.mv) { const i = +d.mv, j = i + +d.d, r = ROTEIROS[S.rotSel].paradas; [r[i], r[j]] = [r[j], r[i]]; saveRots(); toast('Ordem das paradas atualizada no roteiro.'); return render(); }
+  if (d.prev) { S.prev = d.prev; return render(); }
+  if (d.edtab) { S.edTab = d.edtab; $('#ed-pub').hidden = d.edtab === 'tec'; $('#ed-tec').hidden = d.edtab !== 'tec'; $$('[data-edtab]').forEach(b => b.setAttribute('aria-selected', b.dataset.edtab === d.edtab)); return; } // sem render: não perde campos ainda não salvos
+  if (d.goto) { e.preventDefault(); return $('#' + d.goto).scrollIntoView({ behavior:'smooth' }); }
+  if (d.cmd) { e.preventDefault(); return document.execCommand(d.cmd, false, d.v ? `<${d.v}>` : null); }
+  const H = {
+    perfil:() => { location.hash = '#/perfil'; },
+    entrar:() => { e.preventDefault(); dlg(`<div class="dlg-h"><h2 style="font-size:1.15rem">Entrar</h2><button class="btn sm ghost" data-act="fecharDlg" aria-label="Fechar">${ic('x')}</button></div><div class="dlg-b">
+      <p style="margin-top:0">A conta é opcional: navegar continua livre. Com ela, você salva bens numa lista própria.</p><p class="small mut">No sistema, o login seria por link enviado ao e-mail, sem senha. <span class="tag sug">sugestão, fora do TR</span></p></div>
+      <div class="dlg-f"><button class="btn" data-act="fecharDlg">Agora não</button><button class="btn pri" data-act="entrarOk" data-slug="${d.slug || ''}">Entrar como Camila Duarte (simulação)</button></div>`); },
+    entrarOk:() => { S.role = 'membro'; store.set('ep-role', 'membro'); if (d.slug && !S.salvos.includes(d.slug)) { S.salvos.push(d.slug); store.set('ep-salvos', S.salvos); }
+      $('#dlg').close(); render(); toast(d.slug ? `Você entrou. ${BY[d.slug].nome} foi salvo na sua lista.` : 'Você entrou como Camila Duarte.'); },
+    favoritar:() => { if (S.role !== 'membro') return H.entrar();
+      const s = d.slug, on = S.salvos.includes(s); S.salvos = on ? S.salvos.filter(x => x !== s) : [...S.salvos, s]; store.set('ep-salvos', S.salvos);
+      if (document.body.classList.contains('mode-map')) { $('#hdr').innerHTML = hdr('mapa'); renderMapUI(); } else render();
+      toast(on ? 'Removido da sua lista.' : 'Salvo na sua lista. Veja em "Salvos".'); },
+    sair:() => { S.role = 'visitante'; store.set('ep-role', 'visitante'); location.hash = '#/'; toast('Você saiu da conta. O site continua aberto.'); },
+    'meus-dados':() => { baixar('meus-dados.json', JSON.stringify({ nome:'Camila Duarte', email:'camila.duarte@exemplo.org', salvos:S.salvos.map(s => BY[s].nome) }, null, 2), 'application/json'); toast('Arquivo com os seus dados baixado.'); },
+    'excluir-conta':() => toast('No sistema, pede confirmação e apaga a conta e a lista. Simulação.'),
+    reset:() => { try { sessionStorage.clear(); } catch (er) {} location.hash = '#/perfil'; location.reload(); },
+    filtros:() => { S.filtrosAbertos = !S.filtrosAbertos; renderMapUI(); },
+    limpar:() => { S.f = { inst:['municipal','estadual','federal'], tip:'', per:'', est:'', d:'', near:false }; if (nearMarker) nearMarker.remove(); filtrosNaURL(); atualizaMapa(); },
+    perto:() => perto(),
+    leg:() => { S.legMin = !S.legMin; renderMapUI(); },
+    fecharSide:() => { const el = $('.side'), fim = () => { S.sel = null; S.sheet = 'peek'; marcaSel(null); renderMapUI(); };
+      if (!el) return fim(); if (innerWidth < 900) { el.style.transition = 'transform .3s cubic-bezier(.32,.72,0,1)'; el.style.transform = `translateY(${el.offsetHeight}px)`; } else el.classList.add('leave'); setTimeout(fim, 260); },
+    ver:() => irPara(d.slug),
+    copiar:() => { const u = 'https://encontrocomopatrimonio.org.br/bem/' + (BY[d.slug].named ? d.slug : 'exemplo') + '/'; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => toast('Link copiado: ' + u), () => toast('Link: ' + u)); },
+    compartilhar:() => { const u = 'https://encontrocomopatrimonio.org.br/bem/' + d.slug + '/'; if (navigator.share) navigator.share({ title:BY[d.slug].nome, url:u }).catch(() => {}); else toast('No celular, abre o menu de compartilhar do aparelho. Link: ' + u); },
+    imprimir:() => print(),
+    zoom:() => dlg(`<div class="dlg-h"><span class="small">${d.alt}</span><button class="btn sm ghost" data-act="fecharDlg" aria-label="Fechar">${ic('x')}</button></div><img src="${d.src}" alt="${d.alt}" style="width:100%;max-height:75vh;object-fit:contain;background:#111">`),
+    fecharDlg:() => $('#dlg').close(),
+    'so-mart':() => toast('No protótipo, só a ficha do Edifício Martinelli abre no editor.'),
+    simul:() => toast('Ação simulada no protótipo.'),
+    'tax-edit':() => dlgTax(d.k, +d.i), 'tax-novo':() => dlgTax(d.k, -1), 'tax-ok':() => taxOk(),
+    'rot-sel':() => { S.rotSel = +d.i; render(); },
+    'pat-salvar':() => patSalvar(), 'pat-padrao':() => { S.patForm = { ...PAT_PADRAO }; S.patErr = null; render(); toast('Valores padrão carregados. Clique em Salvar para aplicar.'); },
+    'mod-ir':() => { S.role = d.r; store.set('ep-role', S.role); S.sel = null; if (d.l) S.lang = d.l; location.hash = d.h; },
+    'rot-novo':() => { ROTEIROS.push({ slug:slugDe('Novo roteiro'), nome:'Novo roteiro', resumo:'', apres:'', paradas:[], st:'rascunho' }); S.rotSel = ROTEIROS.length - 1; saveRots(); render(); const n = $('#r-nome'); n.focus(); n.select(); toast('Roteiro criado como rascunho.'); },
+    'rot-add':() => { const s = d.slug, r = ROTEIROS[S.rotSel]; r.paradas.push([s, '']); saveRots(); render(); $('#r-busca').focus(); buscaParada(''); toast(`${BY[s].nome} entrou como parada ${r.paradas.length}.`); },
+    'rot-rm':() => { const r = ROTEIROS[S.rotSel]; if (r.st === 'publicado' && r.paradas.length <= 2) return toast('Um roteiro publicado precisa de ao menos 2 paradas. Despublique antes de remover.'); const [s] = r.paradas.splice(+d.i, 1); saveRots(); render(); toast(`${BY[s[0]].nome} saiu do roteiro.`); },
+    'rot-pub':() => { const r = ROTEIROS[S.rotSel];
+      if (r.st === 'publicado') { r.st = 'rascunho'; saveRots(); render(); return toast(`"${r.nome}" saiu do site e voltou para rascunho.`); }
+      if (!r.nome.trim()) { toast('Dê um nome ao roteiro antes de publicar.'); return $('#r-nome').focus(); }
+      if (r.paradas.length < 2) { toast('Um roteiro precisa de ao menos 2 paradas para ser publicado.'); return $('#r-busca').focus(); }
+      r.st = 'publicado'; saveRots(); render(); toast(`"${r.nome}" publicado. Já aparece em Roteiros, no site.`); },
+    'rot-del':() => { const r = ROTEIROS[S.rotSel]; dlg(`<div class="dlg-h"><b>Excluir roteiro</b><button class="btn sm ghost" data-act="fecharDlg" aria-label="Fechar">${ic('x')}</button></div><div style="padding:1.25rem;max-width:30rem"><p style="margin:0 0 1rem">Excluir "${ea(r.nome)}"? ${r.st === 'publicado' ? 'Ele sai do site na hora. ' : ''}Esta ação não pode ser desfeita.</p><div style="display:flex;gap:.5rem;justify-content:flex-end"><button class="btn" data-act="fecharDlg">Cancelar</button><button class="btn pri" data-act="rot-del-ok">Excluir roteiro</button></div></div>`); },
+    'rot-del-ok':() => { const [r] = ROTEIROS.splice(S.rotSel, 1); S.rotSel = 0; saveRots(); $('#dlg').close(); render(); toast(`"${r.nome}" excluído.`); },
+    'rot-ver':() => { S.role = 'visitante'; store.set('ep-role', S.role); location.hash = `#/roteiros/${d.slug}/`; toast('Abrindo o site como visitante. Use "Trocar perfil" para voltar ao painel.'); },
+    'novo-salvar':() => criarBem(false), 'novo-enviar':() => criarBem(true),
+    link:() => toast('No sistema, abre a caixa para colar o endereço do link.'),
+    addImg:() => { S.mart.novaImg = true; S.mart.imgLic = ''; S.mart.erroLic = false; S.mart.campos = lerCampos(); S.mart.texto = $('#rte').innerHTML; S.salvo = false; saveMart(); render(); $('#novaImg').scrollIntoView({ block:'center' }); },
+    salvar:() => salvar(false), enviar:() => salvar(true),
+    publicar:() => decidir(true), devolver:() => decidir(false),
+    'prev-rev':() => dlg(`<div class="dlg-h"><b>Prévia: Edifício Martinelli, v${S.mart.ver + 1}</b><button class="btn sm ghost" data-act="fecharDlg" aria-label="Fechar">${ic('x')}</button></div><div class="dlg-b"><div class="cmp-pair">${fig(IMG.martArq, 'Na época')}${fig(IMG[S.mart.novaImg ? 'martAt2' : 'martAt'], 'Hoje')}</div><div class="prose small" style="margin-top:1rem">${S.mart.texto || MART.texto}</div></div>`),
+    importar:() => { S.imp = 1; dlgImport(); }, imp1:() => { S.imp = 1; dlgImport(); }, imp2:() => { S.imp = 2; dlgImport(); }, imp3:() => { S.imp = 3; dlgImport(); },
+    impOk:() => { $('#dlg').close(); toast('Importação simulada: nada foi gravado. 69 bens foram para a fila de geocodificação.'); },
+    'exp-csv':() => exportar(),
+    convidar:() => dlg(`<form method="dialog" id="fConv" novalidate><div class="dlg-h"><h2 style="font-size:1.15rem">Convidar pessoa da equipe</h2><button type="button" class="btn sm ghost" data-act="fecharDlg" aria-label="Fechar">${ic('x')}</button></div><div class="dlg-b">
+      <div class="field"><label for="cv-n">Nome <span class="req">*</span></label><input id="cv-n" required></div><div class="field"><label for="cv-e">E-mail <span class="req">*</span></label><input id="cv-e" type="email" required></div>
+      <div class="field"><label for="cv-p">Papel</label><select id="cv-p"><option>Editor(a)</option><option>Revisor(a)</option><option>Administrador(a)</option></select></div><p id="cv-err" class="ferr" hidden></p></div>
+      <div class="dlg-f"><button type="button" class="btn" data-act="fecharDlg">Cancelar</button><button type="button" class="btn pri" data-act="convOk">Enviar convite</button></div></form>`),
+    convOk:() => { const n = $('#cv-n').value.trim(), em = $('#cv-e').value.trim(), er = $('#cv-err');
+      if (!n || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { er.hidden = false; er.textContent = !n ? 'Informe o nome.' : 'Informe um e-mail válido.'; return; }
+      $('#dlg').close(); toast('Convite simulado. No sistema, a pessoa recebe um e-mail para criar a senha.'); }
+  };
+  if (H[a]) H[a]();
+});
+document.addEventListener('focusin', e => { if (e.target.id === 'r-busca') buscaParada(e.target.value); });
+document.addEventListener('keydown', e => {
+  if (e.target.id === 'r-busca') { const ul = $('#r-res'); if (e.key === 'Enter') { e.preventDefault(); const b = ul.querySelector('button'); if (b) b.click(); } if (e.key === 'Escape') { ul.hidden = true; e.target.setAttribute('aria-expanded', 'false'); } if (e.key === 'ArrowDown') { e.preventDefault(); const b = ul.querySelector('button'); if (b) b.focus(); } return; }
+  if (e.target.closest('#r-res') && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) { e.preventDefault(); const bs = [...$$('#r-res button')], i = bs.indexOf(e.target) + (e.key === 'ArrowDown' ? 1 : -1); (i < 0 ? $('#r-busca') : bs[Math.min(i, bs.length - 1)]).focus(); return; }
+  if (e.target.id === 'q') { const n = sAtivos.length;
+    if (e.key === 'ArrowDown' && n) { e.preventDefault(); sPos = (sPos + 1) % n; } else if (e.key === 'ArrowUp' && n) { e.preventDefault(); sPos = (sPos - 1 + n) % n; }
+    else if (e.key === 'Enter') { e.preventDefault(); return escolhe(Math.max(sPos, 0)); } else if (e.key === 'Escape') { $('#sres').hidden = true; return; } else return;
+    $$('#sres button').forEach((b, i) => b.classList.toggle('act', i === sPos)); return; }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.ph-img[data-act]')) { e.preventDefault(); e.target.click(); }
+  if (e.key === 'Escape' && S.sel && document.body.classList.contains('mode-map')) { S.sel = null; marcaSel(null); renderMapUI(); }
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'q') return busca(e.target.value);
+  if (e.target.dataset.pat) { const P = patLer(); $('#pat-prev').innerHTML = patHTML('sobre', P); $('#pat-prev2').innerHTML = patHTML('', P) || '<span class="small mut">O selo fica oculto.</span>'; return; }
+  if (e.target.id === 'r-busca') return buscaParada(e.target.value);
+  if (e.target.id === 'dq') { const q = norm(e.target.value.trim()); let vis = 0; $$('[data-dn]').forEach(li => { li.hidden = !!q && !li.dataset.dn.includes(q); vis += !li.hidden; }); $('#dvazio').hidden = vis > 0; return; }
+  if (e.target.dataset.fb === 'q') { S.fBens = { ...(S.fBens || { st:'', d:'' }), q:e.target.value }; const p = e.target.selectionStart; render(); const i = $('#bq'); i.focus(); i.setSelectionRange(p, p); }
+  if (e.target.closest('#rte,#eb1,#eb6,#ebt')) S.salvo = false;
+});
+document.addEventListener('change', e => {
+  const t = e.target, d = t.dataset;
+  if (d.inst) { S.f.inst = $$('[data-inst]').filter(x => x.checked).map(x => x.dataset.inst); filtrosNaURL(); atualizaMapa(); }
+  else if (d.f) { S.f[d.f] = t.value; filtrosNaURL(); atualizaMapa(); }
+  else if (d.fb && d.fb !== 'q') { S.fBens = { ...(S.fBens || { q:'' }), [d.fb]:t.value }; render(); }
+  else if (t.id === 'ordD') { S.distOrd = t.value; S.distPag = 1; render(); }
+  else if (d.rf) { const r = ROTEIROS[S.rotSel], v = t.value.trim();
+    if (d.rf === 'nome') { if (!v) { t.value = r.nome; return toast('O roteiro precisa de um nome.'); } r.nome = v; if (r.st === 'rascunho') r.slug = slugDe(v, r.slug); $$('.revlist .on .rnm, .roted .rnm').forEach(x => { x.textContent = v; }); }
+    else r[d.rf] = v; saveRots(); }
+  else if (d.pt) { ROTEIROS[S.rotSel].paradas[+d.pt][1] = t.value.trim(); saveRots(); }
+  else if (d.tipoff) { const k = d.tipoff; S.tipOff = t.checked ? S.tipOff.filter(x => x !== k) : [...S.tipOff, k]; render(); toast(t.checked ? `"${k}" volta a aparecer no filtro do mapa.` : `"${k}" sai do filtro do mapa.`); }
+  else if (t.id === 'ni-lic') { S.mart.imgLic = t.value; if (t.value) { S.mart.erroLic = false; t.closest('.field').classList.remove('bad'); const er = $('#ni-err'); if (er) er.remove(); } }
+  else if (d.actChange === 'papel') toast('Papel alterado (simulação).');
+});
+addEventListener('resize', () => { clearTimeout(render.r); render.r = setTimeout(() => { const m = innerWidth < 900; if (m !== render.m) { render.m = m; if (document.body.classList.contains('mode-map')) renderMapUI(); } }, 150); });
+render.m = innerWidth < 900;
+if (!location.hash || location.hash === "#") history.replaceState(null, "", "#/perfil"); // a primeira tela é sempre a escolha de perfil
+render();
+</script>
+</body>
+</html>
